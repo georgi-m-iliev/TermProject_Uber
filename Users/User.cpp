@@ -1,7 +1,3 @@
-//
-// Created by georgi on 4.5.2023 г..
-//
-
 #include "User.h"
 #include "../Security/SHA256.h"
 #include <cstring>
@@ -40,4 +36,9 @@ void User::setFirstName(const char* name) {
 
 void User::setLastName(const char* name) {
     this->lastName = name;
+}
+
+std::ostream& operator<<(std::ostream& os, const User& user) {
+    std::cout << "User: "  << user.getUsername() << std::endl << user.getFirstName() << " " << user.getLastName() << std::endl;
+    return os;
 }

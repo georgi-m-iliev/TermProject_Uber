@@ -1,7 +1,3 @@
-//
-// Created by georgi on 8.5.2023 г..
-//
-
 #include "Client.h"
 
 size_t Client::getBalance() const {
@@ -9,7 +5,7 @@ size_t Client::getBalance() const {
 }
 
 double Client::getBalanceInLeva() const {
-    return this->wallet / 100.0;
+    return (double)this->wallet / 100.0;
 }
 
 
@@ -18,16 +14,16 @@ void Client::setAmount(size_t amount) {
 }
 
 void Client::setAmountInLeva(double amount) {
-    this->wallet = amount / 100;
+    this->wallet = (size_t)(amount / 100.0);
 }
 
 
 void Client::depositAmount(double leva) {
-    this->wallet += leva * 100;
+    this->wallet += (size_t)(leva * 100);
 }
 
 void Client::withdrawAmount(double leva) {
-    this->wallet -= leva / 100;
+    this->wallet -= (size_t)(leva * 100);
 }
 
 UserType Client::getType() const {

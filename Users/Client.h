@@ -1,3 +1,4 @@
+#pragma once
 #include "User.h"
 
 class Client: public User {
@@ -17,6 +18,7 @@ public:
 
     void depositAmount(double leva);
     void withdrawAmount(double leva);
+
     UserType getType() const override;
 
 };

@@ -1,5 +1,4 @@
 #pragma once
-#include "../Users/User.h"
 #include "../Users/Client.h"
 #include "../Users/Driver.h"
 
@@ -15,7 +14,7 @@ class UserCollection {
 
 public:
     UserCollection(): UserCollection(0) {}
-    UserCollection(size_t capacity);
+    explicit UserCollection(size_t capacity);
     UserCollection(const UserCollection& other);
     UserCollection(UserCollection&& other) noexcept ;
 
@@ -23,11 +22,15 @@ public:
 
     UserCollection& operator=(const UserCollection& other);
     UserCollection& operator=(UserCollection&& other) noexcept;
-
+    User& operator[](int ind);
+    const User& operator[](int ind) const;
+    User& get(int ind);
 
     void add(const User& user);
-
-
-
-
+    void move(const User&& user);
+    void add(const char* username, const char* password, const char* firstName, const char* lastName);
+    void add(const char* username, const char* password, const char* firstName, const char* lastName,
+             const char* carNumber, const char* phone);
+    size_t getSize() const;
+    size_t getCapacity() const;
 };

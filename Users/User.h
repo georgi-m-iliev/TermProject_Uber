@@ -28,4 +28,7 @@ public:
     void setLastName(const char* name);
 
     virtual UserType getType() const = 0;
+
+    friend std::ostream& operator<<(std::ostream& os, const User& user);
 };
+std::ostream& operator<<(std::ostream& os, const User& user);

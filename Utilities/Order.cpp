@@ -40,7 +40,7 @@ short Order::getPassengers() const {
     return this->passengers;
 }
 
-size_t Order::getID() const {
+uint64_t Order::getID() const {
     return 0;
 }
 

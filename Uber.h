@@ -1,17 +1,29 @@
-#include "Users/User.h"
-#include "Utilities/Order.h"
-#include "Utilities/Location.h"
+#pragma once
+#include "Collections/UserCollection.h"
+#include "Collections/OrderCollection.h"
 
 class Uber {
-    Order** orders;
+    UserCollection users;
+    OrderCollection activeOrders;
+    OrderCollection finishedOrders;
+
+    User* activeUser;
+
     static double netEarnings;
 
+    void load();
+    void save();
 
 public:
-    Uber() = default;
+    Uber();
+    ~Uber();
 
 
-    void registerUser();
+    void registerUser(UserType type, std::stringstream& ss);
+    void loginUser(std::stringstream& ss);
+    void logoutUser();
+    void whoami() const;
+
     void order();
     void checkOrder();
     void cancelOrder();
