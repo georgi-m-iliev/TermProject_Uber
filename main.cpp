@@ -66,10 +66,23 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
+        else if(strstr(buffer, "order") == buffer) {
+            try {
+                service.order();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strstr(buffer, "print") == buffer) {
+            try {
+                service.print();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
         else {
-            std::cout << std::endl << "DEBUG: " << ss.str() << std::endl;
-            bool idk = (bool)ss.getline(buffer, BUFFER_SIZE, ' ');
-            std::cout << std::boolalpha << ss.eof() << std::endl;
             std::cout << "Unknown command!" << std::endl;
             continue;
         }

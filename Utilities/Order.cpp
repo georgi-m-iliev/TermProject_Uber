@@ -54,6 +54,10 @@ void Order::setAddress(const char* name, int x, int y, const char* note) {
 
 void Order::setDestination(const char* name, int x, int y, const char* note) {
     destination.setName(name);
+    destination.setPoint(x, y);
+    if(note != nullptr) {
+        destination.setNote(note);
+    }
 }
 
 void Order::setPassengers(short passengers) {

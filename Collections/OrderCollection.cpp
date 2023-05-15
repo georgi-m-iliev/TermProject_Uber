@@ -75,6 +75,13 @@ void OrderCollection::add(const Order& order) {
     this->orders[this->size++] = new Order(order);
 }
 
+void OrderCollection::move(Order&& order) {
+    if(this->size == this->capacity) {
+        resize();
+    }
+    this->orders[this->size++] = new Order(std::move(order));
+}
+
 Order& OrderCollection::operator[](const int ind) {
     if(ind < 0 || ind >= size) {
         throw std::invalid_argument("Index out of bounds!");

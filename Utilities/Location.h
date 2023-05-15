@@ -24,6 +24,8 @@ public:
     void setNote(const char* notes);
     void setPoint(int x, int y);
 
-
+    friend std::ostream& operator<<(std::ostream& os, const Location& loc);
 
 };
+
+std::ostream& operator<<(std::ostream& os, const Location& loc);

@@ -6,7 +6,7 @@ User::User(const char* username, const char* password, const char* firstName, co
         username(username), passwordHash(SHA256::calculate(password)),
         firstName(firstName), lastName(lastName) {}
 
-const MyString &User::getUsername() const {
+const MyString& User::getUsername() const {
     return username;
 }
 

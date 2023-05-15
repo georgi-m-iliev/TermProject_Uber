@@ -28,3 +28,9 @@ void Location::setNote(const char* notes) {
 void Location::setPoint(int x, int y) {
     this->point = {x, y};
 }
+
+std::ostream& operator<<(std::ostream& os, const Location& loc) {
+    os << "Location: " << loc.getName() << " -> " << loc.getPoint().x << " " << loc.getPoint().y << std::endl;
+    os << loc.getNote() << std::endl << std::endl;
+    return os;
+}

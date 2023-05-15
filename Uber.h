@@ -13,6 +13,8 @@ class Uber {
 
     void load();
     void save();
+    void checkUserLoggedIn(const char* message = nullptr) const;
+    void checkActiveUserType(const UserType type) const;
 
 public:
     Uber();
@@ -25,6 +27,7 @@ public:
     void whoami() const;
 
     void order();
+    void print();
     void checkOrder();
     void cancelOrder();
     void payOrder();

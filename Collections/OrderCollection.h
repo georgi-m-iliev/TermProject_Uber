@@ -26,6 +26,7 @@ public:
     Order& get(int ind);
 
     void add(const Order& order);
+    void move(Order&& order);
     size_t getSize() const;
     size_t getCapacity() const;
 };
