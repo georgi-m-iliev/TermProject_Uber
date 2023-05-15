@@ -2,13 +2,13 @@
 // Created by georgi on 4.5.2023 г..
 //
 
+#include <cstring>
 #include "Order.h"
+#include <chrono>
 
 void Order::calcID() {
 
 }
-
-
 
 Order::Order() {
     this->status = OrderStatus::EMPTY;
@@ -21,14 +21,16 @@ Order::Order() {
 Order::Order(const char* addressName, int addressX, int addressY, const char* destinationName, int destinationX,
              int destinationY, short passengers): Order() {
     this->status = OrderStatus::CREATED;
+    calcID();
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* addressNote, const char* destinationName,
              int destinationX, int destinationY, const char* destinationNote, short passengers): Order() {
     this->status = OrderStatus::CREATED;
+    calcID();
 }
 
-uint64_t Order::getID() const {
+size_t Order::getID() const {
     return 0;
 }
 
@@ -76,7 +78,7 @@ void Order::setDriver(const Driver* driver) {
 void Order::setAddress(const char* name, int x, int y, const char* note) {
     this->address.setName(name);
     this->address.setPoint(x, y);
-    if(note != nullptr) {
+    if(strlen(note) != 0) {
         this->address.setNote(note);
     }
 }
@@ -84,7 +86,7 @@ void Order::setAddress(const char* name, int x, int y, const char* note) {
 void Order::setDestination(const char* name, int x, int y, const char* note) {
     this->destination.setName(name);
     this->destination.setPoint(x, y);
-    if(note != nullptr) {
+    if(strlen(note) != 0) {
         this->destination.setNote(note);
     }
 }

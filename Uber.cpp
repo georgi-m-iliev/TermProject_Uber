@@ -28,6 +28,15 @@ void Uber::checkActiveUserType(const UserType type) const {
 }
 
 
+bool Uber::checkUserExist(const char* username) const {
+    for(int i = 0; i < users.getSize(); i++) {
+        if(strcmp(users[i].getUsername().c_str(), username) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Uber::Uber(): activeUser(nullptr) {
     load();
 }
@@ -43,50 +52,62 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
 
     switch(type) {
         case UserType::Client: {
-            Client client;
-            char buffer[BUFFER_SIZE];
+//            Client client;
+            [[maybe_unused]] static char* messages[] = {(char*)"Username?", (char*)"Password?",
+                                       (char*)"First name?", (char*)"First name?"};
+            char buffer[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            client.setUsername(buffer);
+            for(auto & i : buffer) {
+                if(ss.eof()) {
+                    throw std::runtime_error("You didn't supply all the needed data!");
+                }
+                ss.getline(i, BUFFER_SIZE, ' ');
+            }
+            if(!ss.eof()) {
+                throw std::runtime_error("You have provided more than the needed data!");
+            }
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            client.setPassword(buffer);
+            if(checkUserExist(buffer[0])) {
+                throw std::runtime_error("User with the same username already exists!");
+            }
+//            client.setUsername(buffer[0]);
+//            client.setPassword(buffer[1]);
+//            client.setFirstName(buffer[2]);
+//            client.setLastName(buffer[3]);
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            client.setFirstName(buffer);
-
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            client.setLastName(buffer);
-
-//            std::cout << client;
-            users.move(std::move(client));
+            users.move(Client(buffer[0], buffer[1], buffer[2], buffer[3]));
         } break;
         case UserType::Driver: {
-            Driver driver;
-            char buffer[BUFFER_SIZE];
+//            Driver driver;
+            [[maybe_unused]] static char* messages[] = {(char*)"Username?", (char*)"Password?",
+                                       (char*)"First name?", (char*)"First name?",
+                                       (char*)"Car number?", (char*)"Phone number?"};
+            char buffer[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setUsername(buffer);
+            for(auto & i : buffer) {
+                if(ss.eof()) {
+                    throw std::runtime_error("You didn't supply all the needed data!");
+                }
+                ss.getline(i, BUFFER_SIZE, ' ');
+            }
+            if(!ss.eof()) {
+                throw std::runtime_error("You have provided more than the needed data!");
+            }
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setPassword(buffer);
+            if(checkUserExist(buffer[0])) {
+                throw std::runtime_error("User with the same username already exists!");
+            }
+//            driver.setUsername(buffer[0]);
+//            driver.setPassword(buffer[1]);
+//            driver.setFirstName(buffer[2]);
+//            driver.setLastName(buffer[3]);
+//            driver.setCarNumber(buffer[4]);
+//            driver.setPhoneNumber(buffer[5]);
 
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setFirstName(buffer);
-
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setLastName(buffer);
-
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setCarNumber(buffer);
-
-            ss.getline(buffer, BUFFER_SIZE, ' ');
-            driver.setPhoneNumber(buffer);
-
-            //std::cout << driver;
-            users.move(std::move(driver));
+            users.move(Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]));
         } break;
     }
+    std::cout << "Successful registration! Please login to access the app!" << std::endl;
 }
 
 void Uber::loginUser(std::stringstream& ss) {
@@ -98,7 +119,7 @@ void Uber::loginUser(std::stringstream& ss) {
     ss.getline(buffer, BUFFER_SIZE, ' ');
     for(int i = 0; i < users.getSize(); i++) {
         if(strcmp(users[i].getUsername().c_str(), buffer) == 0) {
-            //TODO: this is very dirt way of doing tдепозhis, fix later
+            //TODO: this is very dirt way of doing this, fix later
             activeUser = &users[i];
         }
     }
@@ -132,30 +153,53 @@ void Uber::order() {
 
     static char *messages[] = {(char*)"Address?", (char*)"Destination?", (char*)"Number of passengers?"};
     Order order;
+    char line[BUFFER_SIZE];
     for(int i = 0; i < 3; i++) {
         std::cout << "    " << messages[i] << " > ";
-        if(i == 2) {
-            short passengerCount;
-            std::cin >> passengerCount;
-            std::cin.ignore(1);
-            order.setPassengers(passengerCount);
-        }
-        else {
-            int x, y;
-            char buffer[2][MAX_LENGTH];
-            std::cin.getline(buffer[0], MAX_LENGTH, ' ');
-            std::cin >> x >> y;
-            std::cin.ignore(1);
-            std::cin.getline(buffer[1], MAX_LENGTH);
-            if(i == 0) {
-                order.setAddress(buffer[0], x, y, buffer[1]);
-            }
-            else if(i == 1) {
-                order.setDestination(buffer[0], x, y, buffer[1]);
-            }
+        std::cin.getline(line, BUFFER_SIZE);
+        std::stringstream ss(line);
+
+        switch(i) {
+            case 0:
+            case 1:{
+                int x, y;
+                char addressBuffer[2][MAX_LENGTH] = {};
+                ss.getline(addressBuffer[0], MAX_LENGTH, ' ');
+                ss >> x >> y;
+                ss.ignore(1);
+                std::cout << "is it eof?: " << std::boolalpha << ss.eof() << std::endl;
+                if(!ss.eof()) {
+                    ss.getline(addressBuffer[1], MAX_LENGTH);
+                }
+                else {
+                    addressBuffer[1][0] = '\0';
+                }
+                switch(i) {
+                    case 0:
+                        order.setAddress(addressBuffer[0], x, y, addressBuffer[1]);
+                        break;
+                    case 1:
+                        order.setDestination(addressBuffer[0], x, y, addressBuffer[1]);
+                        break;
+                    //This code in unreachable but the stupid IDE keeps on complaining lol
+                    default:
+                        throw std::logic_error("Uncovered logic path! Programmer error!");
+                }
+            } break;
+            case 2: {
+                short passengerCount;
+                std::cin >> passengerCount;
+                std::cin.ignore(1);
+                order.setPassengers(passengerCount);
+            } break;
+            default:
+                throw std::logic_error("Uncovered logic path! Programmer error!");
         }
     }
+
     order.setClient((Client*)activeUser);
+    order.setStatus(OrderStatus::CREATED);
+    std::cout << order.getID() << std::endl;
     activeOrders.move(std::move(order));
 }
 

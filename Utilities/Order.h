@@ -18,7 +18,7 @@ enum class OrderStatus {
 };
 
 class Order {
-    OrderID id;
+    size_t id;
     OrderStatus status;
     const Client* client;
     const Driver* driver;
@@ -38,7 +38,7 @@ public:
           const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
           short passengers);
 
-    uint64_t getID() const;
+    size_t getID() const;
     OrderStatus getStatus() const;
     const Client& getClient() const;
     const Driver& getDriver() const;
