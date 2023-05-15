@@ -155,6 +155,7 @@ void Uber::order() {
             }
         }
     }
+    order.setClient((Client*)activeUser);
     activeOrders.move(std::move(order));
 }
 

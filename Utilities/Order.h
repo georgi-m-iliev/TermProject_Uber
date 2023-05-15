@@ -6,6 +6,7 @@
 #include "../Utilities/OrderID.h"
 
 enum class OrderStatus {
+    EMPTY,
     CREATED,
     AWAITING_DRIVER,
     ACCEPTED_BY_DRIVER,
@@ -19,12 +20,12 @@ enum class OrderStatus {
 class Order {
     OrderID id;
     OrderStatus status;
-    Client* client;
-    Driver* driver;
+    const Client* client;
+    const Driver* driver;
     Location address;
     Location destination;
     short passengers;
-    double amount;
+    size_t amount;
 
     void calcID();
 
@@ -37,14 +38,23 @@ public:
           const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
           short passengers);
 
+    uint64_t getID() const;
+    OrderStatus getStatus() const;
+    const Client& getClient() const;
+    const Driver& getDriver() const;
     const Location& getAddress() const;
     const Location& getDestination() const;
     short getPassengers() const;
-    uint64_t getID() const;
+    size_t getAmount() const;
 
+    void setStatus(OrderStatus status);
+    void setClient(const Client* client);
+    void setDriver(const Driver* driver);
     void setAddress(const char* name, int x, int y, const char* note = nullptr);
     void setDestination(const char* name, int x, int y, const char* note = nullptr);
     void setPassengers(short passengers);
-    void rateDriver(short rating) ;
+    void setAmount(size_t amount);
+    void rateDriver(short rating);
+
 
 };

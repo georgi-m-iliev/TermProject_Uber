@@ -8,7 +8,7 @@ class Driver: public User {
     MyString carNumber;
     PhoneNumber phone;
     Location currentLocation;
-    double rating = 0;
+    mutable double rating = 0;
 public:
     Driver() = default;
     Driver(const char* username, const char* password, const char* firstName, const char* lastName,
@@ -28,7 +28,7 @@ public:
     void setCarNumber(const char* str);
     void setPhoneNumber(const char* str);
     void setLocation(const char* name, int x, int y);
-    void addRating(int rating);
+    void addRating(int rating) const;
 
 
     UserType getType() const override;

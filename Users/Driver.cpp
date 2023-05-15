@@ -28,7 +28,7 @@ void Driver::setLocation(const char* name, int x, int y) {
     this->currentLocation = {name, x, y};
 }
 
-void Driver::addRating(int rating) {
+void Driver::addRating(int rating) const {
     this->rating += rating;
     this->rating /= 2.0;
 }

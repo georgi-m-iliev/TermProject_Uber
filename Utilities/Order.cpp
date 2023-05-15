@@ -11,21 +11,37 @@ void Order::calcID() {
 
 
 Order::Order() {
-    status = OrderStatus::CREATED;
-    client = nullptr;
-    driver = nullptr;
-    passengers = 0;
-    amount = 0;
+    this->status = OrderStatus::EMPTY;
+    this->client = nullptr;
+    this->driver = nullptr;
+    this->passengers = 0;
+    this->amount = 0;
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* destinationName, int destinationX,
              int destinationY, short passengers): Order() {
-
+    this->status = OrderStatus::CREATED;
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* addressNote, const char* destinationName,
              int destinationX, int destinationY, const char* destinationNote, short passengers): Order() {
+    this->status = OrderStatus::CREATED;
+}
 
+uint64_t Order::getID() const {
+    return 0;
+}
+
+OrderStatus Order::getStatus() const {
+    return this->status;
+}
+
+const Client& Order::getClient() const {
+    return *this->client;
+}
+
+const Driver& Order::getDriver() const {
+    return *this->driver;
 }
 
 const Location &Order::getAddress() const {
@@ -40,23 +56,36 @@ short Order::getPassengers() const {
     return this->passengers;
 }
 
-uint64_t Order::getID() const {
-    return 0;
+size_t Order::getAmount() const {
+    return this->amount;
+}
+
+
+void Order::setStatus(OrderStatus status) {
+    this->status = status;
+}
+
+void Order::setClient(const Client* client) {
+    this->client = client;
+}
+
+void Order::setDriver(const Driver* driver) {
+    this->driver = driver;
 }
 
 void Order::setAddress(const char* name, int x, int y, const char* note) {
-    address.setName(name);
-    address.setPoint(x, y);
+    this->address.setName(name);
+    this->address.setPoint(x, y);
     if(note != nullptr) {
-        address.setNote(note);
+        this->address.setNote(note);
     }
 }
 
 void Order::setDestination(const char* name, int x, int y, const char* note) {
-    destination.setName(name);
-    destination.setPoint(x, y);
+    this->destination.setName(name);
+    this->destination.setPoint(x, y);
     if(note != nullptr) {
-        destination.setNote(note);
+        this->destination.setNote(note);
     }
 }
 
@@ -64,11 +93,14 @@ void Order::setPassengers(short passengers) {
     this->passengers = passengers;
 }
 
+void Order::setAmount(size_t amount) {
+    this->amount = amount;
+}
+
 void Order::rateDriver(short rating) {
-    if(driver == nullptr) {
+    if(this->driver == nullptr) {
         //TODO: add path
         return;
     }
-    driver->rating += rating;
-    driver->rating /= 2.0;
+    driver->addRating(rating);
 }
