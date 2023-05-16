@@ -3,7 +3,6 @@
 #include "MyString.h"
 #include "../Users/Client.h"
 #include "../Users/Driver.h"
-#include "../Utilities/OrderID.h"
 
 enum class OrderStatus {
     EMPTY,
@@ -18,7 +17,7 @@ enum class OrderStatus {
 };
 
 class Order {
-    size_t id;
+    MyString id;
     OrderStatus status;
     const Client* client;
     const Driver* driver;
@@ -38,7 +37,7 @@ public:
           const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
           short passengers);
 
-    size_t getID() const;
+    const char* getID() const;
     OrderStatus getStatus() const;
     const Client& getClient() const;
     const Driver& getDriver() const;
@@ -56,5 +55,8 @@ public:
     void setAmount(size_t amount);
     void rateDriver(short rating);
 
-
+    friend class Uber;
+    friend std::ostream& operator<<(std::ostream& os, const Order& order);
 };
+
+std::ostream& operator<<(std::ostream& os, const Order& order);

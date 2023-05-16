@@ -6,8 +6,41 @@
 #include "Order.h"
 #include <chrono>
 
-void Order::calcID() {
+namespace {
+    void numToStr(size_t num, char* str) {
+        int len = 0;
+        size_t copy = num;
+        do {
+            copy /= 10;
+            len++;
+        } while(copy != 0);
+        for(int i = len - 1; i >= 0; i--) {
+            str[i] = (char)(num % 10 + '0');
+            num /= 10;
+        }
+        str[len] = '\0';
+    }
+}
 
+// izvadi 8 ot neshtoto i dobavi broi putnici
+void Order::calcID() {
+    static size_t EPOCH_START = 1684108800;
+    char str[20];
+    size_t seconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
+    seconds -= EPOCH_START;
+    numToStr(seconds, str);
+
+    for(int i = 0; i < strlen(str); i++) {
+        if(i % 2 == 0) {
+            str[i] += 'A' - '0';
+        }
+        str[i] += 'a' - '0';
+        if(i % 3 == 0) {
+            str[i] -= 8 + this->passengers;
+        }
+    }
+
+    this->id = str;
 }
 
 Order::Order() {
@@ -30,8 +63,8 @@ Order::Order(const char* addressName, int addressX, int addressY, const char* ad
     calcID();
 }
 
-size_t Order::getID() const {
-    return 0;
+const char* Order::getID() const {
+    return this->id.c_str();
 }
 
 OrderStatus Order::getStatus() const {
@@ -93,6 +126,7 @@ void Order::setDestination(const char* name, int x, int y, const char* note) {
 
 void Order::setPassengers(short passengers) {
     this->passengers = passengers;
+    calcID();
 }
 
 void Order::setAmount(size_t amount) {
@@ -105,4 +139,11 @@ void Order::rateDriver(short rating) {
         return;
     }
     driver->addRating(rating);
+}
+
+std::ostream& operator<<(std::ostream& os, const Order& order) {
+    std::cout << "---------------====================---------------" << std::endl;
+    std::cout << "Your order: ID " << order.getID() << std::endl;
+    std::cout << "[ " << order.getAddress() << " ] -> [ " << order.getDestination() << " ]" << std::endl;
+    std::cout << "Passengers: " << order.getPassengers() << "  Amount: " << order.getAmount() << std::endl;
 }

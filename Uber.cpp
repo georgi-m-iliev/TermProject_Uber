@@ -167,7 +167,7 @@ void Uber::order() {
                 ss.getline(addressBuffer[0], MAX_LENGTH, ' ');
                 ss >> x >> y;
                 ss.ignore(1);
-                std::cout << "is it eof?: " << std::boolalpha << ss.eof() << std::endl;
+//                std::cout << "is it eof?: " << std::boolalpha << ss.eof() << std::endl;
                 if(!ss.eof()) {
                     ss.getline(addressBuffer[1], MAX_LENGTH);
                 }
@@ -199,12 +199,10 @@ void Uber::order() {
 
     order.setClient((Client*)activeUser);
     order.setStatus(OrderStatus::CREATED);
-    std::cout << order.getID() << std::endl;
+    order.calcID();
+    std::cout << order;
     activeOrders.move(std::move(order));
 }
 
 void Uber::print() {
-    std::cout << activeOrders[0].getAddress();
-    std::cout << activeOrders[0].getDestination();
-    std::cout << activeOrders[0].getPassengers() << std::endl;
 }
