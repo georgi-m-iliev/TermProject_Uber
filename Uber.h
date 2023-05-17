@@ -29,7 +29,7 @@ public:
 
     void order();
     void print();
-    void checkOrder();
+    void checkOrder(const char* id);
     void cancelOrder();
     void payOrder();
     void rateOrder();

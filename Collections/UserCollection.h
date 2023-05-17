@@ -27,7 +27,7 @@ public:
     User& get(int ind);
 
     void add(const User& user);
-    void move(const User&& user);
+    void add(User&& user);
     void add(const char* username, const char* password, const char* firstName, const char* lastName);
     void add(const char* username, const char* password, const char* firstName, const char* lastName,
              const char* carNumber, const char* phone);

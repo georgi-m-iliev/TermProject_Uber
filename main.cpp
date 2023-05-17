@@ -5,20 +5,7 @@
 
 const int BUFFER_SIZE = 1024;
 
-#include <chrono>
-
 int main() {
-//    std::time_t t = std::time(0);   // get time now
-//    std::tm* now = std::localtime(&t);
-//    std::cout << (now->tm_year + 1900) << '-'
-//              << (now->tm_mon + 1) << '-'
-//              <<  now->tm_mday
-//              << "\n";
-//
-    size_t sec = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);;
-    std::cout << sec;
-
-    return 0;
     Uber service;
     char buffer[BUFFER_SIZE];
     while(true) {
@@ -33,9 +20,9 @@ int main() {
         std::stringstream ss(buffer);
         ss.getline(buffer, BUFFER_SIZE, ' ');
 
-        if(strstr(buffer, "register") == buffer) {
+        if(strcmp(buffer, "register") == 0) {
             ss.getline(buffer, BUFFER_SIZE, ' ');
-            if(strstr(buffer, "client") == buffer) {
+            if(strcmp(buffer, "client") == 0) {
                 try {
                     service.registerUser(UserType::Client, ss);
                 }
@@ -43,7 +30,7 @@ int main() {
                     std::cout << ex.what() << std::endl;
                 }
             }
-            else if(strstr(buffer, "driver") == buffer) {
+            else if(strcmp(buffer, "driver") == 0) {
                 try {
                     service.registerUser(UserType::Driver, ss);
                 }
@@ -55,7 +42,7 @@ int main() {
                 std::cout << "Unknown user type! Try again!" << std::endl;
             }
         }
-        else if(strstr(buffer, "login") == buffer) {
+        else if(strcmp(buffer, "login") == 0) {
             try {
                 service.loginUser(ss);
             }
@@ -63,7 +50,7 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strstr(buffer, "logout") == buffer) {
+        else if(strcmp(buffer, "logout") == 0) {
             try {
                 service.logoutUser();
             }
@@ -71,7 +58,7 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strstr(buffer, "whoami") == buffer) {
+        else if(strcmp(buffer, "whoami") == 0) {
             try {
                 service.whoami();
             }
@@ -79,7 +66,7 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strstr(buffer, "order") == buffer) {
+        else if(strcmp(buffer, "order") == 0) {
             try {
                 service.order();
             }
@@ -87,7 +74,16 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strstr(buffer, "print") == buffer) {
+        else if(strcmp(buffer, "check_order") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            try {
+                service.checkOrder(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what();
+            }
+        }
+        else if(strcmp(buffer, "print") == 0) {
             try {
                 service.print();
             }

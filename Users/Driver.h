@@ -19,6 +19,8 @@ public:
     Driver(const Driver& other) = default;
     Driver(Driver&& other) = default;
     ~Driver() override = default;
+    virtual Driver* clone() const;
+
 
     const char* getCarNumber() const;
     const char* getPhoneNumber() const;

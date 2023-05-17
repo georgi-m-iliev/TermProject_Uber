@@ -10,6 +10,8 @@ public:
     Client(const Client& other) = default;
     Client(Client&& other) = default;
     ~Client() override = default;
+    virtual User* clone() const;
+
 
     size_t getBalance() const;
     double getBalanceInLeva() const;

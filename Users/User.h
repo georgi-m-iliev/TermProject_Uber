@@ -17,6 +17,7 @@ public:
     User(const User& other) = default;
     User(User&& other) = default;
     virtual ~User() = default;
+    virtual User* clone() const = 0;
 
     const MyString& getUsername() const;
     const MyString& getFirstName() const;

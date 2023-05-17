@@ -6,7 +6,7 @@ void UserCollection::copyFrom(const UserCollection& other) {
     this->size = other.size;
     this->capacity = other.capacity;
     for(int i = 0; i < this->size; i++) {
-        this->users[i] = other.users[i];
+        this->users[i] = other.users[i]->clone();
     }
 }
 
@@ -130,7 +130,7 @@ size_t UserCollection::getCapacity() const {
     return this->capacity;
 }
 
-void UserCollection::move(const User&& user) {
+void UserCollection::add(User&& user) {
     if(this->size == this->capacity) {
         resize();
     }

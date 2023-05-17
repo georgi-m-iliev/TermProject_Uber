@@ -36,7 +36,8 @@ void Order::calcID() {
         }
         str[i] += 'a' - '0';
         if(i % 3 == 0) {
-            str[i] -= 8 + this->passengers;
+            str[i] -= 8;
+            str[i] += this->passengers;
         }
     }
 
@@ -143,7 +144,8 @@ void Order::rateDriver(short rating) {
 
 std::ostream& operator<<(std::ostream& os, const Order& order) {
     std::cout << "---------------====================---------------" << std::endl;
-    std::cout << "Your order: ID " << order.getID() << std::endl;
+    std::cout << "Your order ID: " << order.getID() << std::endl;
     std::cout << "[ " << order.getAddress() << " ] -> [ " << order.getDestination() << " ]" << std::endl;
-    std::cout << "Passengers: " << order.getPassengers() << "  Amount: " << order.getAmount() << std::endl;
+    std::cout << "Passengers: " << order.getPassengers() << "  Amount: " << order.getAmount() << std::endl << std::endl;
+    return os;
 }

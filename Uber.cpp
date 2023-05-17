@@ -5,6 +5,8 @@
 const int BUFFER_SIZE = 100;
 
 void Uber::load() {
+    users.add("georgi", "123", "Georgi", "Iliev");
+    activeUser = &users[0];
 
 }
 
@@ -75,7 +77,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
 //            client.setFirstName(buffer[2]);
 //            client.setLastName(buffer[3]);
 
-            users.move(Client(buffer[0], buffer[1], buffer[2], buffer[3]));
+            users.add(Client(buffer[0], buffer[1], buffer[2], buffer[3]));
         } break;
         case UserType::Driver: {
 //            Driver driver;
@@ -104,7 +106,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
 //            driver.setCarNumber(buffer[4]);
 //            driver.setPhoneNumber(buffer[5]);
 
-            users.move(Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]));
+            users.add(Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]));
         } break;
     }
     std::cout << "Successful registration! Please login to access the app!" << std::endl;
@@ -156,12 +158,11 @@ void Uber::order() {
     char line[BUFFER_SIZE];
     for(int i = 0; i < 3; i++) {
         std::cout << "    " << messages[i] << " > ";
-        std::cin.getline(line, BUFFER_SIZE);
-        std::stringstream ss(line);
-
         switch(i) {
             case 0:
             case 1:{
+                std::cin.getline(line, BUFFER_SIZE);
+                std::stringstream ss(line);
                 int x, y;
                 char addressBuffer[2][MAX_LENGTH] = {};
                 ss.getline(addressBuffer[0], MAX_LENGTH, ' ');
@@ -201,8 +202,21 @@ void Uber::order() {
     order.setStatus(OrderStatus::CREATED);
     order.calcID();
     std::cout << order;
-    activeOrders.move(std::move(order));
+    activeOrders.add(std::move(order));
 }
 
 void Uber::print() {
+}
+
+void Uber::checkOrder(const char* id) {
+    for(int i = 0; i < activeOrders.getSize(); i++) {
+        if(strcmp(activeOrders[i].getID(), id) == 0) {
+            if(activeOrders[i].client != activeUser && activeOrders[i].driver != activeUser) {
+                throw std::runtime_error("You have no access to this order!");
+            }
+            std::cout << activeOrders[i];
+            return;
+        }
+    }
+    throw std::runtime_error("Order with this ID was not found!");
 }

@@ -75,7 +75,24 @@ void OrderCollection::add(const Order& order) {
     this->orders[this->size++] = new Order(order);
 }
 
-void OrderCollection::move(Order&& order) {
+void OrderCollection::add(const char* addressName, int addressX, int addressY,
+                          const char* destinationName, int destinationX, int destinationY, short passengers) {
+    if(this->size == this->capacity) {
+        resize();
+    }
+    this->orders[this->size++] = new Order(addressName, addressX, addressY, destinationName, destinationX, destinationY, passengers);
+}
+
+void OrderCollection::add(const char* addressName, int addressX, int addressY, const char* addressNote,
+                          const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
+                          short passengers) {
+    if(this->size == this->capacity) {
+        resize();
+    }
+    this->orders[this->size++] = new Order(addressName, addressX, addressY, addressNote, destinationName, destinationX, destinationY, destinationNote, passengers);
+}
+
+void OrderCollection::add(Order&& order) {
     if(this->size == this->capacity) {
         resize();
     }

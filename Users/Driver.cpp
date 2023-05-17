@@ -1,5 +1,9 @@
 #include "Driver.h"
 
+Driver* Driver::clone() const {
+    return new Driver(*this);
+}
+
 const char* Driver::getCarNumber() const {
     return this->carNumber.c_str();
 }
