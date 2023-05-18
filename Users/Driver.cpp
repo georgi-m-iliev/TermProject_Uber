@@ -40,3 +40,7 @@ void Driver::addRating(int rating) const {
 UserType Driver::getType() const {
     return UserType::Driver;
 }
+
+void Driver::setRating(double rating) {
+    this->rating = rating;
+}

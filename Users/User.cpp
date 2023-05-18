@@ -26,6 +26,10 @@ void User::setUsername(const char* username) {
     this->username = username;
 }
 
+void User::setPasswordHash(const char* password) {
+    this->passwordHash = password;
+}
+
 void User::setPassword(const char* password) {
     this->passwordHash = SHA256::calculate(password);
 }
@@ -36,6 +40,32 @@ void User::setFirstName(const char* name) {
 
 void User::setLastName(const char* name) {
     this->lastName = name;
+}
+
+
+size_t User::getBalance() const {
+    return this->wallet;
+}
+
+double User::getBalanceInLeva() const {
+    return (double)this->wallet / 100.0;
+}
+
+
+void User::setBalance(size_t amount) {
+    this->wallet = amount;
+}
+
+void User::setBalanceInLeva(double amount) {
+    this->wallet = (size_t)(amount / 100.0);
+}
+
+void User::depositAmount(double leva) {
+    this->wallet += (size_t)(leva * 100);
+}
+
+void User::withdrawAmount(double leva) {
+    this->wallet -= (size_t)(leva * 100);
 }
 
 std::ostream& operator<<(std::ostream& os, const User& user) {

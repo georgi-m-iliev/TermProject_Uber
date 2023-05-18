@@ -29,15 +29,17 @@ void Order::calcID() {
     size_t seconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
     seconds -= EPOCH_START;
     numToStr(seconds, str);
-
+// 212413
     for(int i = 0; i < strlen(str); i++) {
         if(i % 2 == 0) {
             str[i] += 'A' - '0';
         }
-        str[i] += 'a' - '0';
-        if(i % 3 == 0) {
+        else if(i % 3 == 0) {
             str[i] -= 8;
             str[i] += this->passengers;
+        }
+        else {
+            str[i] += 'a' - '0';
         }
     }
 
@@ -64,6 +66,18 @@ Order::Order(const char* addressName, int addressX, int addressY, const char* ad
     calcID();
 }
 
+Order::Order(const char* id, const OrderStatus status, const Client* client, const Driver* driver,
+             const Location& address, const Location& destination, const short passengers, const size_t amount) {
+    this->id = id;
+    this->status = status;
+    this->client = client;
+    this->driver = driver;
+    this->address = address;
+    this->destination = destination;
+    this->passengers = passengers;
+    this->amount = amount;
+}
+
 const char* Order::getID() const {
     return this->id.c_str();
 }
@@ -80,11 +94,11 @@ const Driver& Order::getDriver() const {
     return *this->driver;
 }
 
-const Location &Order::getAddress() const {
+const Location& Order::getAddress() const {
     return this->address;
 }
 
-const Location &Order::getDestination() const {
+const Location& Order::getDestination() const {
     return this->destination;
 }
 
@@ -92,10 +106,10 @@ short Order::getPassengers() const {
     return this->passengers;
 }
 
+
 size_t Order::getAmount() const {
     return this->amount;
 }
-
 
 void Order::setStatus(OrderStatus status) {
     this->status = status;

@@ -25,7 +25,8 @@ public:
     void setPoint(int x, int y);
 
     friend std::ostream& operator<<(std::ostream& os, const Location& loc);
-
+    friend std::istream& operator>>(std::istream& is, Location& loc);
 };
 
 std::ostream& operator<<(std::ostream& os, const Location& loc);
+std::istream& operator>>(std::istream& is, Location& loc);

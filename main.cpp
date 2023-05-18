@@ -7,6 +7,7 @@ const int BUFFER_SIZE = 1024;
 
 int main() {
     Uber service;
+
     char buffer[BUFFER_SIZE];
     while(true) {
         std::cout << "> ";
@@ -78,6 +79,47 @@ int main() {
             ss.getline(buffer, BUFFER_SIZE, ' ');
             try {
                 service.checkOrder(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what();
+            }
+        }
+        else if(strcmp(buffer, "cancel_order") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            try {
+                service.cancelOrder(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what();
+            }
+        }
+        else if(strcmp(buffer, "pay") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            double value;
+            ss >> value;
+            try {
+                service.payOrder(buffer, value  );
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what();
+            }
+        }
+        else if(strcmp(buffer, "rate") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            short value;
+            ss >> value;
+            try {
+                service.rateOrder(buffer, value);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what();
+            }
+        }
+        else if(strcmp(buffer, "add_money") == 0) {
+            double value;
+            ss >> value;
+            try {
+                service.addMoney(value);
             }
             catch(std::exception& ex) {
                 std::cout << ex.what();

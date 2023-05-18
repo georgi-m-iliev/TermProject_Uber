@@ -17,6 +17,9 @@ class Uber {
     void checkActiveUserType(const UserType type) const;
     bool checkUserExist(const char* username) const;
 
+    void readUsers(const char* filepth);
+    void readOrders(const char* filepth, OrderCollection& col);
+
 public:
     Uber();
     ~Uber();
@@ -30,10 +33,10 @@ public:
     void order();
     void print();
     void checkOrder(const char* id);
-    void cancelOrder();
-    void payOrder();
-    void rateOrder();
-    void addMoney();
+    void cancelOrder(const char* id);
+    void payOrder(const char* id, double levas);
+    void rateOrder(const char* id, short rating);
+    void addMoney(double levas);
 
     void changeAddress();
     void checkMessages();

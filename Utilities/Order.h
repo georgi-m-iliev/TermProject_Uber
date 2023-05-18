@@ -36,6 +36,8 @@ public:
     Order(const char* addressName, int addressX, int addressY, const char* addressNote,
           const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
           short passengers);
+    Order(const char* id, const OrderStatus status, const Client* client, const Driver* driver,
+          const Location& address, const Location& destination, const short passengers, const size_t amount);
 
     const char* getID() const;
     OrderStatus getStatus() const;

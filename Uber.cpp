@@ -1,13 +1,178 @@
 #include "Uber.h"
 #include <sstream>
 #include <cstring>
+#include <fstream>
 
 const int BUFFER_SIZE = 100;
 
-void Uber::load() {
-    users.add("georgi", "123", "Georgi", "Iliev");
-    activeUser = &users[0];
+void Uber::readUsers(const char* filePath) {
+    std::ifstream ifs(filePath, std::ios::in);
+    if(!ifs.is_open()) {
+        throw std::runtime_error("File couldn't be opened! Continuing without user data!");
+    }
+    char buffer[BUFFER_SIZE * 10];
+    // read the heading file, as we don't need it!
+    ifs.getline(buffer, BUFFER_SIZE * 10);
+    while(!ifs.eof()) {
+        ifs.getline(buffer, BUFFER_SIZE * 10);
+        std::stringstream ss(buffer);
+        ss.getline(buffer, BUFFER_SIZE, ',');
+        if(strcmp(buffer, "0") == 0) {
+            //this is client
+            static char* messages[] = {(char*)"username", (char*)"password",
+                                       (char*)"firstName", (char*)"lastName"};
+            char buffer2[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
+            for(int i = 0; i < sizeof(messages) / sizeof(char*); i++) {
+                ss.getline(buffer2[i], BUFFER_SIZE, ',');
+                if(ss.eof()) {
+                    throw std::runtime_error("Not enough data!");
+                }
+            }
 
+            Client client;
+            client.setUsername(buffer2[0]);
+            client.setPasswordHash(buffer2[1]);
+            client.setFirstName(buffer2[2]);
+            client.setLastName(buffer2[3]);
+            size_t value;
+            ss >> value;
+            client.setBalance(value);
+            if(!ss.eof()) {
+                throw std::runtime_error("Invalid file!");
+            }
+            users.add(std::move(client));
+        }
+        else if(strcmp(buffer, "1") == 0) {
+            //this is driver
+            static char* messages[] = {(char*)"username", (char*)"password",
+                                       (char*)"firstName", (char*)"lastName",
+                                       (char*)"carNumber", (char*)"phoneNumber"};
+            char buffer2[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
+            for(int i = 0; i < sizeof(messages) / sizeof(char*); i++) {
+                ss.getline(buffer2[i], BUFFER_SIZE, ',');
+                if(ss.eof()) {
+                    throw std::runtime_error("Row consists of incomplete data!");
+                }
+            }
+            Driver driver;
+            driver.setUsername(buffer2[0]);
+            driver.setPasswordHash(buffer2[1]);
+            driver.setFirstName(buffer2[2]);
+            driver.setLastName(buffer2[3]);
+            size_t balance;
+            ss >> balance;
+            ss.ignore(1, ',');
+            driver.setCarNumber(buffer2[4]);
+            driver.setPhoneNumber(buffer2[5]);
+            double rating;
+            ss >> rating;
+            driver.setRating(rating);
+            if(!ss.eof()) {
+                throw std::runtime_error("Row consists of too much data!");
+            }
+            users.add(std::move(driver));
+        }
+    }
+    ifs.close();
+}
+
+
+void Uber::readOrders(const char* path, OrderCollection& col) {
+    std::ifstream ifs(path, std::ios::in);
+    if(!ifs.is_open()) {
+
+    }
+
+    char buffer[BUFFER_SIZE];
+    // read the heading file, as we don't need it!
+    ifs.getline(buffer, BUFFER_SIZE);
+    while(!ifs.eof()) {
+        ifs.getline(buffer, BUFFER_SIZE);
+        std::stringstream ss(buffer);
+        char* messages[] = {(char*)"id", (char*)"status", (char*)"clientUsername", (char*)"driverUsername",
+                          (char*)"address", (char*)"destination", (char*)"passengers", (char*)"amount"};
+        char buffer2[3][BUFFER_SIZE];
+        Location l1, l2; //4, 5
+        short status, passengers; // 1,6
+        size_t amount; //7
+        const Client* client;
+        const Driver* driver;
+        for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
+            switch(i) {
+                case 1:
+                    ss >> status;
+                    ss.ignore(1, ',');
+                    break;
+                case 4:
+                    ss >> l1;
+                    ss.ignore(1, ',');
+                    break;
+                case 5:
+                    ss >> l2;
+                    ss.ignore(1, ',');
+                    break;
+                case 6:
+                    ss >> passengers;
+                    ss.ignore(1, ',');
+                    break;
+                case 7:
+                    ss >> amount;
+                    ss.ignore(1, ',');
+                default:
+                    ss.getline(buffer2[j++], BUFFER_SIZE, ',');
+            }
+        }
+        for(int k = 0; k < users.getSize(); k++) {
+            if(strcmp(users[k].getUsername().c_str(), buffer2[1]) == 0) {
+                client = (Client*)&users[k];
+            }
+            else if(strcmp(users[k].getUsername().c_str(), buffer2[2]) == 0) {
+                driver = (Driver*)&users[k];
+            }
+        }
+        activeOrders.add(Order(buffer2[1], (OrderStatus)status, client, driver, l1, l2, passengers, amount));
+    }
+
+    ifs.close();
+}
+
+void Uber::load() {
+    try {
+        readUsers(R"(D:\Workspace\FMI\OOP_TermProject_Uber\users.csv)");
+    }
+    catch(std::exception& ex) {
+        if(strstr(ex.what(), "File couldn't be opened!") == ex.what()) {
+            std::cout << ex.what();
+        }
+        else if(strcmp(ex.what(), "Row consists of incomplete data!") == 0) {
+            std::cout << "FIle isn't complete!";
+        }
+        else if(strcmp(ex.what(), "Row consists of too much data!") == 0) {
+
+        }
+        else {
+            std::cout << "Loading from file was unsuccessful!" << std::endl;
+        }
+
+    }
+    try {
+        readOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\orders.csv)", activeOrders);
+    }
+    catch(std::exception& ex) {
+        if(strstr(ex.what(), "File couldn't be opened!") == ex.what()) {
+            std::cout << ex.what();
+        }
+        else if(strcmp(ex.what(), "Row consists of incomplete data!") == 0) {
+            std::cout << "FIle isn't complete!";
+        }
+        else if(strcmp(ex.what(), "Row consists of too much data!") == 0) {
+
+        }
+        else {
+            std::cout << "Loading from file was unsuccessful!" << std::endl;
+        }
+
+    }
 }
 
 void Uber::save() {
@@ -54,7 +219,6 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
 
     switch(type) {
         case UserType::Client: {
-//            Client client;
             [[maybe_unused]] static char* messages[] = {(char*)"Username?", (char*)"Password?",
                                        (char*)"First name?", (char*)"First name?"};
             char buffer[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
@@ -72,15 +236,10 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
-//            client.setUsername(buffer[0]);
-//            client.setPassword(buffer[1]);
-//            client.setFirstName(buffer[2]);
-//            client.setLastName(buffer[3]);
 
             users.add(Client(buffer[0], buffer[1], buffer[2], buffer[3]));
         } break;
         case UserType::Driver: {
-//            Driver driver;
             [[maybe_unused]] static char* messages[] = {(char*)"Username?", (char*)"Password?",
                                        (char*)"First name?", (char*)"First name?",
                                        (char*)"Car number?", (char*)"Phone number?"};
@@ -99,13 +258,6 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
-//            driver.setUsername(buffer[0]);
-//            driver.setPassword(buffer[1]);
-//            driver.setFirstName(buffer[2]);
-//            driver.setLastName(buffer[3]);
-//            driver.setCarNumber(buffer[4]);
-//            driver.setPhoneNumber(buffer[5]);
-
             users.add(Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]));
         } break;
     }
@@ -168,7 +320,6 @@ void Uber::order() {
                 ss.getline(addressBuffer[0], MAX_LENGTH, ' ');
                 ss >> x >> y;
                 ss.ignore(1);
-//                std::cout << "is it eof?: " << std::boolalpha << ss.eof() << std::endl;
                 if(!ss.eof()) {
                     ss.getline(addressBuffer[1], MAX_LENGTH);
                 }
@@ -206,9 +357,11 @@ void Uber::order() {
 }
 
 void Uber::print() {
+
 }
 
 void Uber::checkOrder(const char* id) {
+    checkUserLoggedIn();
     for(int i = 0; i < activeOrders.getSize(); i++) {
         if(strcmp(activeOrders[i].getID(), id) == 0) {
             if(activeOrders[i].client != activeUser && activeOrders[i].driver != activeUser) {
@@ -219,4 +372,35 @@ void Uber::checkOrder(const char* id) {
         }
     }
     throw std::runtime_error("Order with this ID was not found!");
+}
+
+void Uber::cancelOrder(const char* id) {
+    checkUserLoggedIn();
+    checkActiveUserType(UserType::Client);
+    for(int i = 0; i < activeOrders.getSize(); i++) {
+        if(strcmp(activeOrders[i].getID(), id) == 0) {
+            if(activeOrders[i].client != activeUser && activeOrders[i].driver != activeUser) {
+                throw std::runtime_error("You have no access to this order!");
+            }
+            activeOrders[i].setStatus(OrderStatus::CANCELED);
+            return;
+        }
+    }
+    throw std::runtime_error("Order with this ID was not found!");
+}
+
+void Uber::payOrder(const char* id, double levas) {
+    checkUserLoggedIn();
+    checkActiveUserType(UserType::Client);
+}
+
+void Uber::rateOrder(const char* id, short rating) {
+    checkUserLoggedIn();
+    checkActiveUserType(UserType::Client);
+}
+
+void Uber::addMoney(double levas) {
+    checkUserLoggedIn();
+    checkActiveUserType(UserType::Client);
+    ((Client*)activeUser)->depositAmount(levas);
 }

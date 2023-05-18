@@ -31,6 +31,7 @@ public:
     void setPhoneNumber(const char* str);
     void setLocation(const char* name, int x, int y);
     void addRating(int rating) const;
+    void setRating(double rating);
 
 
     UserType getType() const override;

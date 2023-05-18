@@ -34,3 +34,15 @@ std::ostream& operator<<(std::ostream& os, const Location& loc) {
     os << "(" << loc.getNote() << ")";
     return os;
 }
+
+std::istream& operator>>(std::istream& is, Location& loc) {
+    char buffer[100];
+    is.getline(buffer, 100, ' ');
+    loc.setName(buffer);
+    int x, y;
+    is >> x >> y;
+    loc.setPoint(x, y);
+    is.getline(buffer, 100);
+    loc.setNote(buffer);
+    return is;
+}
