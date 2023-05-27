@@ -1,12 +1,12 @@
-//
-// Created by georgi on 4.5.2023 г..
-//
-
 #include <cstring>
 #include "Order.h"
 #include <chrono>
 
 namespace {
+    int absInt(const int num) {
+        return num < 0 ? -num : num;
+    }
+
     void numToStr(size_t num, char* str) {
         int len = 0;
         size_t copy = num;
@@ -22,7 +22,6 @@ namespace {
     }
 }
 
-// izvadi 8 ot neshtoto i dobavi broi putnici
 void Order::calcID() {
     static size_t EPOCH_START = 1684108800;
     char str[20];
@@ -36,7 +35,7 @@ void Order::calcID() {
         }
         else if(i % 3 == 0) {
             str[i] -= 8;
-            str[i] += this->passengers;
+            str[i] += absInt(address.getPoint().x - address.getPoint().y);
         }
         else {
             str[i] += 'a' - '0';
@@ -47,22 +46,22 @@ void Order::calcID() {
 }
 
 Order::Order() {
-    this->status = OrderStatus::EMPTY;
-    this->client = nullptr;
-    this->driver = nullptr;
-    this->passengers = 0;
-    this->amount = 0;
+    status = OrderStatus::EMPTY;
+    client = nullptr;
+    driver = nullptr;
+    passengers = 0;
+    amount = 0;
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* destinationName, int destinationX,
              int destinationY, short passengers): Order() {
-    this->status = OrderStatus::CREATED;
+    status = OrderStatus::CREATED;
     calcID();
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* addressNote, const char* destinationName,
              int destinationX, int destinationY, const char* destinationNote, short passengers): Order() {
-    this->status = OrderStatus::CREATED;
+    status = OrderStatus::CREATED;
     calcID();
 }
 
@@ -79,36 +78,36 @@ Order::Order(const char* id, const OrderStatus status, const Client* client, con
 }
 
 const char* Order::getID() const {
-    return this->id.c_str();
+    return id.c_str();
 }
 
 OrderStatus Order::getStatus() const {
-    return this->status;
+    return status;
 }
 
 const Client& Order::getClient() const {
-    return *this->client;
+    return *client;
 }
 
 const Driver& Order::getDriver() const {
-    return *this->driver;
+    return *driver;
 }
 
 const Location& Order::getAddress() const {
-    return this->address;
+    return address;
 }
 
 const Location& Order::getDestination() const {
-    return this->destination;
+    return destination;
 }
 
 short Order::getPassengers() const {
-    return this->passengers;
+    return passengers;
 }
 
 
 size_t Order::getAmount() const {
-    return this->amount;
+    return amount;
 }
 
 void Order::setStatus(OrderStatus status) {
@@ -124,18 +123,18 @@ void Order::setDriver(const Driver* driver) {
 }
 
 void Order::setAddress(const char* name, int x, int y, const char* note) {
-    this->address.setName(name);
-    this->address.setPoint(x, y);
+    address.setName(name);
+    address.setPoint(x, y);
     if(strlen(note) != 0) {
-        this->address.setNote(note);
+        address.setNote(note);
     }
 }
 
 void Order::setDestination(const char* name, int x, int y, const char* note) {
-    this->destination.setName(name);
-    this->destination.setPoint(x, y);
+    destination.setName(name);
+    destination.setPoint(x, y);
     if(strlen(note) != 0) {
-        this->destination.setNote(note);
+        destination.setNote(note);
     }
 }
 

@@ -1,35 +1,44 @@
 #include "Driver.h"
 
+Driver::Driver(const char* username, const char* password, const char* firstName, const char* lastName,
+               const char* carNumber, const char* phone):
+        User(username, password, firstName, lastName),
+        carNumber(carNumber), phone(phone), currentLocation{}, rating(0) {}
+
 Driver* Driver::clone() const {
     return new Driver(*this);
 }
 
 const char* Driver::getCarNumber() const {
-    return this->carNumber.c_str();
+    return carNumber.c_str();
 }
 
 const char* Driver::getPhoneNumber() const {
-    return this->phone.c_str();
+    return phone.c_str();
 }
 
 const Location& Driver::getCurrentLocation() const {
-    return this->currentLocation;
+    return currentLocation;
 }
 
 double Driver::getRating() const {
-    return this->rating;
+    return rating;
 }
 
 void Driver::setCarNumber(const char* str) {
-    this->carNumber = str;
+    carNumber = str;
 }
 
 void Driver::setPhoneNumber(const char* str) {
-    this->phone = str;
+    phone = str;
 }
 
 void Driver::setLocation(const char* name, int x, int y) {
-    this->currentLocation = {name, x, y};
+    currentLocation = {name, x, y};
+}
+
+void Driver::setRating(double rating) {
+    this->rating = rating;
 }
 
 void Driver::addRating(int rating) const {
@@ -39,8 +48,4 @@ void Driver::addRating(int rating) const {
 
 UserType Driver::getType() const {
     return UserType::Driver;
-}
-
-void Driver::setRating(double rating) {
-    this->rating = rating;
 }

@@ -81,7 +81,7 @@ int main() {
                 service.checkOrder(buffer);
             }
             catch(std::exception& ex) {
-                std::cout << ex.what();
+                std::cout << ex.what() << std::endl;
             }
         }
         else if(strcmp(buffer, "cancel_order") == 0) {

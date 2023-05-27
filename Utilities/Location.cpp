@@ -20,8 +20,8 @@ void Location::setName(const char* name) {
     this->name = name;
 }
 
-void Location::setNote(const char* notes) {
-    this->note = notes;
+void Location::setNote(const char* note) {
+    this->note = note;
 
 }
 

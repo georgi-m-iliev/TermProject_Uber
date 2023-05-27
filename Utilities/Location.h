@@ -4,6 +4,8 @@
 struct Point {
     int x;
     int y;
+    Point(): x(0), y(0) {}
+    Point(int x, int y): x(x), y(y) {}
 };
 
 class Location {
@@ -13,15 +15,15 @@ class Location {
 
 public:
     Location() = default;
-    Location(const char* name, int x, int y): name(name), point{x, y} {}
-    Location(const char* name, int x, int y, const char* note): name(name), point{x, y}, note(note) {}
+    Location(const char* name, int x, int y): name(name), point(x, y) {}
+    Location(const char* name, int x, int y, const char* note): name(name), point(x, y), note(note) {}
 
     const MyString& getName() const;
     const MyString& getNote() const;
     const Point& getPoint() const;
 
     void setName(const char* name);
-    void setNote(const char* notes);
+    void setNote(const char* note);
     void setPoint(int x, int y);
 
     friend std::ostream& operator<<(std::ostream& os, const Location& loc);

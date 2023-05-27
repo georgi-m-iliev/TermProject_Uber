@@ -1,4 +1,4 @@
-
+// TODO: finish validation in constructor and operator >>
 #include "PhoneNumber.h"
 
 #include <cstring>
@@ -36,7 +36,7 @@ const char* PhoneNumber::c_str() const {
 }
 
 std::istream& operator>>(std::istream& is, PhoneNumber& number) {
-    is.getline(number.data, MAX_LENGTH);
+    is.getline(number.data, PhoneNumber::MAX_LENGTH);
     return is;
 }
 

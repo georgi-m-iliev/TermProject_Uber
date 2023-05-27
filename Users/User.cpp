@@ -35,37 +35,37 @@ void User::setPassword(const char* password) {
 }
 
 void User::setFirstName(const char* name) {
-    this->firstName = name;
+    firstName = name;
 }
 
 void User::setLastName(const char* name) {
-    this->lastName = name;
+    lastName = name;
 }
 
 
 size_t User::getBalance() const {
-    return this->wallet;
+    return wallet;
 }
 
 double User::getBalanceInLeva() const {
-    return (double)this->wallet / 100.0;
+    return (double)wallet / 100.0;
 }
 
 
 void User::setBalance(size_t amount) {
-    this->wallet = amount;
+    wallet = amount;
 }
 
 void User::setBalanceInLeva(double amount) {
-    this->wallet = (size_t)(amount / 100.0);
+    wallet = (size_t)(amount / 100.0);
 }
 
 void User::depositAmount(double leva) {
-    this->wallet += (size_t)(leva * 100);
+    wallet += (size_t)(leva * 100);
 }
 
 void User::withdrawAmount(double leva) {
-    this->wallet -= (size_t)(leva * 100);
+    wallet -= (size_t)(leva * 100);
 }
 
 std::ostream& operator<<(std::ostream& os, const User& user) {

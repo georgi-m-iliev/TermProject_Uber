@@ -1,11 +1,14 @@
 #pragma once
-#include "Collections/UserCollection.h"
-#include "Collections/OrderCollection.h"
+#include "Utilities/vector.hpp"
+#include "Utilities/SharedPtr.hpp"
+#include "Users/Client.h"
+#include "Users/Driver.h"
+#include "Utilities/Order.h"
 
 class Uber {
-    UserCollection users;
-    OrderCollection activeOrders;
-    OrderCollection finishedOrders;
+    vector<SharedPtr<User>> users;
+    vector<SharedPtr<Order>> activeOrders;
+    vector<SharedPtr<Order>> finishedOrders;
 
     User* activeUser;
 
@@ -17,8 +20,8 @@ class Uber {
     void checkActiveUserType(const UserType type) const;
     bool checkUserExist(const char* username) const;
 
-    void readUsers(const char* filepth);
-    void readOrders(const char* filepth, OrderCollection& col);
+    void readUsers(const char* filepath);
+    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
 
 public:
     Uber();

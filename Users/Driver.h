@@ -12,15 +12,12 @@ class Driver: public User {
 public:
     Driver() = default;
     Driver(const char* username, const char* password, const char* firstName, const char* lastName,
-            const char* carNumber, const char* phone):
-                User(username, password, firstName, lastName),
-                carNumber(carNumber), phone(phone), currentLocation{}, rating(0)
-    {}
+            const char* carNumber, const char* phone);
     Driver(const Driver& other) = default;
     Driver(Driver&& other) = default;
     ~Driver() override = default;
-    virtual Driver* clone() const;
 
+    virtual Driver* clone() const;
 
     const char* getCarNumber() const;
     const char* getPhoneNumber() const;

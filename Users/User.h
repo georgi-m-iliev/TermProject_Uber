@@ -12,12 +12,14 @@ class User {
     MyString firstName;
     MyString lastName;
     size_t wallet = 0;
+
 public:
     User() = default;
     User(const char* username, const char* password, const char* firstName, const char* lastName);
     User(const User& other) = default;
     User(User&& other) = default;
     virtual ~User() = default;
+    
     virtual User* clone() const = 0;
 
     const MyString& getUsername() const;
@@ -42,4 +44,5 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const User& user);
 };
+
 std::ostream& operator<<(std::ostream& os, const User& user);
