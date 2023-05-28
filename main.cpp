@@ -58,6 +58,15 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
+        else if(strcmp(buffer, "change_password") == 0) {
+            ss.getline(buffer, BUFFER_SIZE);
+            try {
+                service.changePassword(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
         else if(strcmp(buffer, "whoami") == 0) {
             try {
                 service.whoami();
@@ -179,7 +188,7 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strcmp(buffer, "pickup_passenger") == 0) {
+        else if(strcmp(buffer, "pickup_passengers") == 0) {
             ss.getline(buffer, BUFFER_SIZE, ' ');
             try {
                 service.pickupPassenger(buffer);

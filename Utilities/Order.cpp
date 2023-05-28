@@ -191,14 +191,14 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
     else {
         std::cout << order.getAmount() << " ";
     }
-    std::cout << "Waiting time: ";
+    std::cout << " Waiting time: ";
     if(order.getMinutes() == -1) {
         std::cout << "NaN";
     }
     else {
         std::cout << order.getMinutes();
     }
-    std::cout << " minutes" << std::endl << std::endl;
+    std::cout << " minutes" << std::endl << "Status: " << (size_t)order.getStatus() << std::endl;
     return os;
 }
 
