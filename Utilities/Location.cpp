@@ -3,6 +3,7 @@
 //
 
 #include "Location.h"
+#include <cmath>
 
 const MyString& Location::getName() const {
     return name;
@@ -45,4 +46,10 @@ std::istream& operator>>(std::istream& is, Location& loc) {
     is.getline(buffer, 100);
     loc.setNote(buffer);
     return is;
+}
+
+double distanceBtwn(const Location& lhs, const Location& rhs) {
+    double dx = lhs.getPoint().x - rhs.getPoint().x;
+    double dy = lhs.getPoint().y - rhs.getPoint().y;
+    return sqrt((dy * dy) + (dx * dx));
 }

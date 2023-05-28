@@ -3,7 +3,6 @@
 #include "../Utilities/PhoneNumber.h"
 #include "../Utilities/Location.h"
 
-
 class Driver: public User {
     MyString carNumber;
     PhoneNumber phone;
@@ -17,7 +16,7 @@ public:
     Driver(Driver&& other) = default;
     ~Driver() override = default;
 
-    virtual Driver* clone() const;
+    virtual Driver* clone() const override;
 
     const char* getCarNumber() const;
     const char* getPhoneNumber() const;
@@ -26,12 +25,10 @@ public:
 
     void setCarNumber(const char* str);
     void setPhoneNumber(const char* str);
-    void setLocation(const char* name, int x, int y);
+    void setCurrentLocation(const char* name, int x, int y);
+    void setCurrentLocation(const Location& loc);
     void addRating(int rating) const;
     void setRating(double rating);
 
-
     UserType getType() const override;
-
-    friend class Order;
 };

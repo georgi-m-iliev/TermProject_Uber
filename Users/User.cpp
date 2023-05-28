@@ -19,7 +19,7 @@ const MyString& User::getLastName() const {
 }
 
 bool User::verifyPassword(const char* password) const {
-    return strcmp(SHA256::calculate(password), passwordHash.c_str()) == 0;
+    return SHA256::compare(password, passwordHash.c_str());
 }
 
 void User::setUsername(const char* username) {
@@ -31,6 +31,9 @@ void User::setPasswordHash(const char* password) {
 }
 
 void User::setPassword(const char* password) {
+    if(password == nullptr) {
+        throw std::invalid_argument("Invalid data received for field password!");
+    }
     this->passwordHash = SHA256::calculate(password);
 }
 

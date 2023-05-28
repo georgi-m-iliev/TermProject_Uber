@@ -9,7 +9,7 @@ public:
     Client(Client&& other) = default;
     ~Client() override = default;
 
-    Client* clone() const override;
+    virtual Client* clone() const override;
 
     UserType getType() const override;
 };

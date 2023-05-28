@@ -17,20 +17,21 @@ class Uber {
     void load();
     void save();
     void checkUserLoggedIn(const char* message = nullptr) const;
-    void checkActiveUserType(const UserType type) const;
+    void checkActiveUserType(UserType type) const;
     bool checkUserExist(const char* username) const;
 
     void readUsers(const char* filepath);
     void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
+    void handoutOrders();
 
 public:
     Uber();
     ~Uber();
 
-
     void registerUser(UserType type, std::stringstream& ss);
     void loginUser(std::stringstream& ss);
     void logoutUser();
+    void changePassword(const char* password);
     void whoami() const;
 
     void order();
@@ -43,8 +44,9 @@ public:
 
     void changeAddress();
     void checkMessages();
-    void acceptOrder();
-    void declineOrder();
-    void finishOrder();
-    void acceptPayment();
+    void acceptOrder(const char* id, short minutes, double amount);
+    void declineOrder(const char* id);
+    void pickupPassenger(const char* id);
+    void finishOrder(const char* id);
+    void acceptPayment(const char* id, double amount);
 };

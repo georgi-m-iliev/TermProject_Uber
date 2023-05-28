@@ -33,8 +33,13 @@ void Driver::setPhoneNumber(const char* str) {
     phone = str;
 }
 
-void Driver::setLocation(const char* name, int x, int y) {
+void Driver::setCurrentLocation(const char* name, int x, int y) {
     currentLocation = {name, x, y};
+}
+
+
+void Driver::setCurrentLocation(const Location& loc) {
+    currentLocation = loc;
 }
 
 void Driver::setRating(double rating) {

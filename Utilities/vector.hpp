@@ -121,7 +121,7 @@ template<class T>
 vector<T>& vector<T>::operator=(vector<T>&& other) noexcept {
     if(this != &other) {
         free();
-        moveFrom(other);
+        moveFrom(std::move(other));
     }
 
     return *this;
@@ -186,4 +186,3 @@ template<class T>
 void vector<T>::clear() {
     size = 0;
 }
-

@@ -51,21 +51,30 @@ Order::Order() {
     driver = nullptr;
     passengers = 0;
     amount = 0;
+    minutes = -1;
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* destinationName, int destinationX,
-             int destinationY, short passengers): Order() {
+             int destinationY, short passengers):
+                address(addressName, addressX, addressY),
+                destination(destinationName, destinationX, destinationY) {
     status = OrderStatus::CREATED;
+    this->passengers = passengers;
+    minutes = -1;
     calcID();
 }
 
 Order::Order(const char* addressName, int addressX, int addressY, const char* addressNote, const char* destinationName,
-             int destinationX, int destinationY, const char* destinationNote, short passengers): Order() {
+             int destinationX, int destinationY, const char* destinationNote, short passengers):
+                address(addressName, addressX, addressY, addressNote),
+                destination(destinationName, destinationX, destinationY, destinationNote) {
     status = OrderStatus::CREATED;
+    this->passengers = passengers;
+    minutes = -1;
     calcID();
 }
 
-Order::Order(const char* id, const OrderStatus status, const Client* client, const Driver* driver,
+Order::Order(const char* id, const OrderStatus status, Client* client, Driver* driver,
              const Location& address, const Location& destination, const short passengers, const size_t amount) {
     this->id = id;
     this->status = status;
@@ -75,6 +84,7 @@ Order::Order(const char* id, const OrderStatus status, const Client* client, con
     this->destination = destination;
     this->passengers = passengers;
     this->amount = amount;
+    this->minutes = -1;
 }
 
 const char* Order::getID() const {
@@ -85,12 +95,20 @@ OrderStatus Order::getStatus() const {
     return status;
 }
 
-const Client& Order::getClient() const {
-    return *client;
+const Client* Order::getClient() const {
+    return client;
 }
 
-const Driver& Order::getDriver() const {
-    return *driver;
+const Driver* Order::getDriver() const {
+    return driver;
+}
+
+Client* Order::getClient() {
+    return client;
+}
+
+Driver* Order::getDriver() {
+    return driver;
 }
 
 const Location& Order::getAddress() const {
@@ -105,6 +123,9 @@ short Order::getPassengers() const {
     return passengers;
 }
 
+short Order::getMinutes() const {
+    return minutes;
+}
 
 size_t Order::getAmount() const {
     return amount;
@@ -114,11 +135,11 @@ void Order::setStatus(OrderStatus status) {
     this->status = status;
 }
 
-void Order::setClient(const Client* client) {
+void Order::setClient(Client* client) {
     this->client = client;
 }
 
-void Order::setDriver(const Driver* driver) {
+void Order::setDriver(Driver* driver) {
     this->driver = driver;
 }
 
@@ -143,6 +164,10 @@ void Order::setPassengers(short passengers) {
     calcID();
 }
 
+void Order::setMinutes(short minutes) {
+    this->minutes = minutes;
+}
+
 void Order::setAmount(size_t amount) {
     this->amount = amount;
 }
@@ -156,9 +181,27 @@ void Order::rateDriver(short rating) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Order& order) {
-    std::cout << "---------------====================---------------" << std::endl;
-    std::cout << "Your order ID: " << order.getID() << std::endl;
+    std::cout << std::endl << "---------------====================---------------" << std::endl;
+    std::cout << "Order ID: " << order.getID() << std::endl;
     std::cout << "[ " << order.getAddress() << " ] -> [ " << order.getDestination() << " ]" << std::endl;
-    std::cout << "Passengers: " << order.getPassengers() << "  Amount: " << order.getAmount() << std::endl << std::endl;
+    std::cout << "Passengers: " << order.getPassengers() << "  Amount: " ;
+    if(order.getAmount() == 0) {
+        std::cout << "NaN";
+    }
+    else {
+        std::cout << order.getAmount() << " ";
+    }
+    std::cout << "Waiting time: ";
+    if(order.getMinutes() == -1) {
+        std::cout << "NaN";
+    }
+    else {
+        std::cout << order.getMinutes();
+    }
+    std::cout << " minutes" << std::endl << std::endl;
     return os;
+}
+
+double Order::getAmountInLeva() const {
+    return (double)amount / 100.0;
 }

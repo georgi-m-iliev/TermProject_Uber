@@ -28,7 +28,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Location& loc);
     friend std::istream& operator>>(std::istream& is, Location& loc);
+    friend double distanceBtwn(const Location& lhs, const Location& rhs);
 };
 
 std::ostream& operator<<(std::ostream& os, const Location& loc);
 std::istream& operator>>(std::istream& is, Location& loc);
+double distanceBtwn(const Location& lhs, const Location& rhs);

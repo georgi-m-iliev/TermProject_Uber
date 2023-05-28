@@ -7,7 +7,6 @@ const int BUFFER_SIZE = 1024;
 
 int main() {
     Uber service;
-
     char buffer[BUFFER_SIZE];
     while(true) {
         std::cout << "> ";
@@ -90,7 +89,7 @@ int main() {
                 service.cancelOrder(buffer);
             }
             catch(std::exception& ex) {
-                std::cout << ex.what();
+                std::cout << ex.what() << std::endl;
             }
         }
         else if(strcmp(buffer, "pay") == 0) {
@@ -98,10 +97,10 @@ int main() {
             double value;
             ss >> value;
             try {
-                service.payOrder(buffer, value  );
+                service.payOrder(buffer, value);
             }
             catch(std::exception& ex) {
-                std::cout << ex.what();
+                std::cout << ex.what() << std::endl;
             }
         }
         else if(strcmp(buffer, "rate") == 0) {
@@ -112,7 +111,7 @@ int main() {
                 service.rateOrder(buffer, value);
             }
             catch(std::exception& ex) {
-                std::cout << ex.what();
+                std::cout << ex.what() << std::endl;
             }
         }
         else if(strcmp(buffer, "add_money") == 0) {
@@ -122,12 +121,89 @@ int main() {
                 service.addMoney(value);
             }
             catch(std::exception& ex) {
-                std::cout << ex.what();
+                std::cout << ex.what() << std::endl;
             }
         }
         else if(strcmp(buffer, "print") == 0) {
             try {
                 service.print();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "change_address") == 0) {
+            try {
+                service.changeAddress();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "check_messages") == 0) {
+            try {
+                service.checkMessages();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "print") == 0) {
+            try {
+                service.print();
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "accept_order") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            short minutes;
+            ss >> minutes;
+            double amount;
+            ss >> amount;
+            ss.ignore(1);
+            try {
+                service.acceptOrder(buffer, minutes, amount);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "decline_order") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            try {
+                service.declineOrder(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "pickup_passenger") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            try {
+                service.pickupPassenger(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "finish_order") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            try {
+                service.finishOrder(buffer);
+            }
+            catch(std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+        else if(strcmp(buffer, "accept_payment") == 0) {
+            ss.getline(buffer, BUFFER_SIZE, ' ');
+            double amount;
+            ss >> amount;
+            ss.ignore(1);
+            try {
+                service.acceptPayment(buffer, amount);
             }
             catch(std::exception& ex) {
                 std::cout << ex.what() << std::endl;
