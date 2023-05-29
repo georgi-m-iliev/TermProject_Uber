@@ -12,26 +12,36 @@ void Uber::readUsers(const char* filepath) {
     if(!ifs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
     }
+
     char buffer[BUFFER_SIZE * 10];
     // read the heading of file, as we don't need it!
     ifs.getline(buffer, BUFFER_SIZE * 10);
+
     while(!ifs.eof()) {
         ifs.getline(buffer, BUFFER_SIZE * 10);
         std::stringstream ss(buffer);
         ss.getline(buffer, BUFFER_SIZE, ',');
+
         if(strcmp(buffer, "0") == 0) {
             //this is client
-            [[maybe_unused]] static char* messages[] = {(char*)"username", (char*)"password",
-                                       (char*)"firstName", (char*)"lastName"};
-            char buffer2[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
-            for(auto & i : buffer2) {
-                ss.getline(i, BUFFER_SIZE, ',');
+            [[maybe_unused]] static char* messages[] = {
+                (char*)"username", (char*)"password",(char*)"firstName", (char*)"lastName", (char*)"amount"
+            };
+            char buffer2[sizeof(messages) / sizeof(char*) - 1][BUFFER_SIZE];
+            size_t amount;
+
+            for(int i = 0; i < sizeof(messages) / sizeof(char*); i++) {
                 if(ss.eof()) {
                     throw std::runtime_error("Row consists of incomplete data!");
                 }
+                switch(i) {
+                    case 4:
+                        ss >> amount;
+                        break;
+                    default:
+                        ss.getline(buffer2[i], BUFFER_SIZE, ',');
+                }
             }
-            size_t value;
-            ss >> value;
             if(!ss.eof()) {
                 throw std::runtime_error("Row consists of too much data!");
             }
@@ -41,26 +51,34 @@ void Uber::readUsers(const char* filepath) {
             client.setPasswordHash(buffer2[1]);
             client.setFirstName(buffer2[2]);
             client.setLastName(buffer2[3]);
-            client.setBalance(value);
+            client.setBalance(amount);
             users.push_back(SharedPtr<User>(new Client(std::move(client))));
         }
         else if(strcmp(buffer, "1") == 0) {
             //this is driver
             [[maybe_unused]] static char* messages[] = {(char*)"username", (char*)"password",
-                                       (char*)"firstName", (char*)"lastName",
-                                       (char*)"carNumber", (char*)"phoneNumber"};
-            char buffer2[sizeof(messages) / sizeof(char*)][BUFFER_SIZE];
-            for(auto & i : buffer2) {
-                ss.getline(i, BUFFER_SIZE, ',');
+                                       (char*)"firstName", (char*)"lastName", (char*)"amount",
+                                       (char*)"carNumber", (char*)"phoneNumber", (char*)"rating"};
+            char buffer2[sizeof(messages) / sizeof(char*) - 2][BUFFER_SIZE];
+            size_t balance;
+            double rating;
+
+            for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
                 if(ss.eof()) {
                     throw std::runtime_error("Row consists of incomplete data!");
                 }
+                switch(i) {
+                    case 4:
+                        ss >> balance;
+                        ss.ignore(1, ',');
+                        break;
+                    case 7:
+                        ss >> rating;
+                        break;
+                    default:
+                        ss.getline(buffer2[j++], BUFFER_SIZE, ',');
+                }
             }
-            size_t balance;
-            ss >> balance;
-            ss.ignore(1, ',');
-            double rating;
-            ss >> rating;
             if(!ss.eof()) {
                 throw std::runtime_error("Row consists of too much data!");
             }
@@ -70,6 +88,7 @@ void Uber::readUsers(const char* filepath) {
             driver.setPasswordHash(buffer2[1]);
             driver.setFirstName(buffer2[2]);
             driver.setLastName(buffer2[3]);
+            driver.setBalance(balance);
             driver.setCarNumber(buffer2[4]);
             driver.setPhoneNumber(buffer2[5]);
             driver.setRating(rating);
@@ -77,6 +96,7 @@ void Uber::readUsers(const char* filepath) {
             users.push_back(SharedPtr<User>(new Driver(std::move(driver))));
         }
     }
+
     ifs.close();
 }
 
@@ -93,14 +113,17 @@ void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
         ifs.getline(buffer, BUFFER_SIZE);
         std::stringstream ss(buffer);
         char* messages[] = {(char*)"id", (char*)"status", (char*)"clientUsername", (char*)"driverUsername",
-                          (char*)"address", (char*)"destination", (char*)"passengers", (char*)"amount"};
-        char buffer2[3][BUFFER_SIZE];
+                          (char*)"address", (char*)"destination", (char*)"passengers", (char*)"minutes",(char*)"amount"};
+        char buffer2[sizeof(messages) / sizeof(char*) - 6][BUFFER_SIZE];
         Location l1, l2; //4, 5
-        short status, passengers; // 1,6
+        short status, passengers, minutes; // 1,6,7
         size_t amount; //7
         Client* client;
         Driver* driver;
         for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
+            if(ss.eof()) {
+                throw std::runtime_error("Row consists of incomplete data!");
+            }
             switch(i) {
                 case 1:
                     ss >> status;
@@ -108,39 +131,44 @@ void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
                     break;
                 case 4:
                     ss >> l1;
-                    ss.ignore(1, ',');
+//                    ss.ignore(1, ',');
                     break;
                 case 5:
                     ss >> l2;
-                    ss.ignore(1, ',');
+//                    ss.ignore(1, ',');
                     break;
                 case 6:
                     ss >> passengers;
                     ss.ignore(1, ',');
                     break;
                 case 7:
+                    ss >> minutes;
+                    ss.ignore(1, ',');
+                    break;
+                case 8:
                     ss >> amount;
                     ss.ignore(1, ',');
+                    break;
                 default:
                     ss.getline(buffer2[j++], BUFFER_SIZE, ',');
-            }
-            if(ss.eof()) {
-                throw std::runtime_error("Row consists of incomplete data!");
             }
         }
         if(!ss.eof()) {
             throw std::runtime_error("Row consists of too much data!");
         }
+        if(strcmp(buffer2[2], "NULL") == 0) {
+            driver = nullptr;
+        }
         for(int k = 0; k < users.getSize(); k++) {
             if(strcmp(users[k]->getUsername().c_str(), buffer2[1]) == 0) {
                 client = dynamic_cast<Client*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is deleted
             }
-            else if(strcmp(users[k]->getUsername().c_str(), buffer2[2]) == 0) {
+            else if(strcmp(buffer2[2], "NULL") != 0 && strcmp(users[k]->getUsername().c_str(), buffer2[2]) == 0) {
                 driver = dynamic_cast<Driver*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is deleted
             }
         }
         netEarnings += (double)amount / 100.0;
-        col.push_back(SharedPtr<Order>(new Order(buffer2[1], (OrderStatus)status, client, driver, l1, l2, passengers, amount)));
+        col.push_back(SharedPtr<Order>(new Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount)));
     }
 
     ifs.close();
@@ -187,23 +215,85 @@ void Uber::load() {
 void Uber::saveUsers(const char* filepath) {
     std::ofstream ofs(filepath, std::ios::out | std::ios::trunc);
     if(!ofs.is_open()) {
+        throw std::runtime_error("File couldn't be opened!");
+    }
 
+    ofs << "type,username,password_hash,first_name,last_name,amount,car_number,phone_number,rating";
+
+    for(int i = 0; i < users.getSize(); i++) {
+        ofs << '\n';
+        ofs << (int)users[i]->getType() << ',';
+        ofs << users[i]->getUsername() << ',';
+        ofs << users[i]->getPasswordHash() << ',';
+        ofs << users[i]->getFirstName() << ',';
+        ofs << users[i]->getLastName() << ',';
+        ofs << users[i]->getBalance();
+
+        if(users[i]->getType() == UserType::Driver) {
+            ofs << ',';
+            ofs << dynamic_cast<Driver*>(&*users[i])->getCarNumber() << ',';
+            ofs << dynamic_cast<Driver*>(&*users[i])->getPhoneNumber() << ',';
+            ofs << dynamic_cast<Driver*>(&*users[i])->getRating();
+        }
     }
 
     ofs.close();
 }
 
-void Uber::saveOrder(const char* filepath, vector<SharedPtr<Order>>& col) {
+void Uber::saveOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
     std::ofstream ofs(filepath, std::ios::out | std::ios::trunc);
     if(!ofs.is_open()) {
+        throw std::runtime_error("File couldn't be opened!");
+    }
 
+    ofs << "id,status,clientUsername,driverUsername,address,destination,passengers,minutes,amount";
+    for(int i = 0; i < col.getSize(); i++) {
+        ofs << '\n';
+        ofs << col[i]->getID() << ',';
+        ofs << (int)col[i]->getStatus() << ',';
+        ofs << col[i]->getClient()->getUsername() << ',';
+        if(col[i]->getDriver()) {
+            ofs << col[i]->getDriver()->getUsername() << ',';
+        }
+        else {
+            ofs << "NULL" << ',';
+        }
+        ofs << col[i]->getAddress().getName() << " " << col[i]->getAddress().getPoint().x << " " << col[i]->getAddress().getPoint().y <<  ',';
+        ofs << col[i]->getDestination().getName() << " " << col[i]->getDestination().getPoint().x << " " << col[i]->getDestination().getPoint().y <<  ',';
+        ofs << col[i]->getPassengers() << ',';
+        ofs << col[i]->getMinutes() << ',';
+        ofs << col[i]->getAmount();
     }
 
     ofs.close();
 }
 
 void Uber::save() {
-
+    try {
+        saveUsers(R"(D:\Workspace\FMI\OOP_TermProject_Uber\users.csv)");
+    }
+    catch(std::exception& ex) {
+        std::cout << "Problem with saving users!" << " ";
+        if(strstr(ex.what(), "File couldn't be opened!") == ex.what()) {
+            std::cout << ex.what();
+        }
+        else {
+            std::cout << "Loading from file was unsuccessful!";
+        }
+    }
+    try {
+        saveOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\active_orders.csv)", activeOrders);
+        saveOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\finished_orders.csv)", finishedOrders);
+    }
+    catch(std::exception& ex) {
+        std::cout << "Problem with saving orders!" << " ";
+        if(strstr(ex.what(), "File couldn't be opened!") == ex.what()) {
+            std::cout << ex.what();
+        }
+        else {
+            std::cout << "Loading from file was unsuccessful!";
+        }
+    }
 }
 
 void Uber::checkUserLoggedIn(const char* message) const {
@@ -436,7 +526,7 @@ void Uber::checkOrder(const char* id) {
             if(activeOrders[i]->getClient() != activeUser && activeOrders[i]->getDriver() != activeUser) {
                 throw std::runtime_error("You have no access to this order or action unavailable!");
             }
-            std::cout << *activeOrders[i];
+            std::cout << std::endl << *activeOrders[i] << std::endl;
             return;
         }
     }
@@ -532,18 +622,15 @@ void Uber::checkMessages() {
     checkActiveUserType(UserType::Driver);
     handoutOrders();
     std::cout << std::endl <<  "-----------Driver messages from System!-----------" << std::endl;
-    bool empty = false;
+    bool empty = true;
     for(int i = 0; i < activeOrders.getSize(); i++) {
         if(activeOrders[i]->getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i]->getDriver() == activeUser) {
             std::cout << *activeOrders[i] << std::endl;
             empty = false;
         }
-        else {
-            empty = true;
-        }
     }
     if(empty) {
-        std::cout << "     No new messages!" << std::endl;
+        std::cout << "                 No new messages!                 " << std::endl << std::endl;
     }
 }
 

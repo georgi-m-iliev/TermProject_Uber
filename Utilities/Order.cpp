@@ -75,7 +75,7 @@ Order::Order(const char* addressName, int addressX, int addressY, const char* ad
 }
 
 Order::Order(const char* id, const OrderStatus status, Client* client, Driver* driver,
-             const Location& address, const Location& destination, const short passengers, const size_t amount) {
+             const Location& address, const Location& destination, const short passengers, short minutes, const size_t amount) {
     this->id = id;
     this->status = status;
     this->client = client;
@@ -84,7 +84,7 @@ Order::Order(const char* id, const OrderStatus status, Client* client, Driver* d
     this->destination = destination;
     this->passengers = passengers;
     this->amount = amount;
-    this->minutes = -1;
+    this->minutes = minutes;
 }
 
 const char* Order::getID() const {
@@ -181,7 +181,7 @@ void Order::rateDriver(short rating) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Order& order) {
-    std::cout << std::endl << "---------------====================---------------" << std::endl;
+    std::cout << "---------------====================---------------" << std::endl;
     std::cout << "Order ID: " << order.getID() << std::endl;
     std::cout << "[ " << order.getAddress() << " ] -> [ " << order.getDestination() << " ]" << std::endl;
     std::cout << "Passengers: " << order.getPassengers() << "  Amount: " ;

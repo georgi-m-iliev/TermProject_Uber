@@ -36,6 +36,7 @@ std::ostream& operator<<(std::ostream& os, const Location& loc) {
     return os;
 }
 
+// reading from csv file
 std::istream& operator>>(std::istream& is, Location& loc) {
     char buffer[100];
     is.getline(buffer, 100, ' ');
@@ -43,7 +44,7 @@ std::istream& operator>>(std::istream& is, Location& loc) {
     int x, y;
     is >> x >> y;
     loc.setPoint(x, y);
-    is.getline(buffer, 100);
+    is.getline(buffer, 100, ',');
     loc.setNote(buffer);
     return is;
 }

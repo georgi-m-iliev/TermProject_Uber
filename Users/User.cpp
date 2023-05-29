@@ -18,6 +18,10 @@ const MyString& User::getLastName() const {
     return lastName;
 }
 
+const MyString& User::getPasswordHash() const {
+    return passwordHash;
+}
+
 bool User::verifyPassword(const char* password) const {
     return SHA256::compare(password, passwordHash.c_str());
 }

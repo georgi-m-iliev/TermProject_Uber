@@ -25,6 +25,7 @@ public:
     const MyString& getUsername() const;
     const MyString& getFirstName() const;
     const MyString& getLastName() const;
+    const MyString& getPasswordHash() const;
     bool verifyPassword(const char* password) const;
     void setUsername(const char* username);
     void setPassword(const char* password);

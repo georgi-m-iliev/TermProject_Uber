@@ -23,7 +23,7 @@ class Uber {
     void readUsers(const char* filepath);
     void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
     void saveUsers(const char* filepath);
-    void saveOrder(const char* filepath, vector<SharedPtr<Order>>& col);
+    void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
     void handoutOrders();
 
 public:

@@ -37,7 +37,7 @@ public:
           const char* destinationName, int destinationX, int destinationY, const char* destinationNote,
           short passengers);
     Order(const char* id, OrderStatus status, Client* client, Driver* driver,
-          const Location& address, const Location& destination, short passengers, size_t amount);
+          const Location& address, const Location& destination, short passengers, short minutes, size_t amount);
 
     const char* getID() const;
     OrderStatus getStatus() const;
