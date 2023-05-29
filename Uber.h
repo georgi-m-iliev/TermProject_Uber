@@ -24,6 +24,7 @@ class Uber {
     void checkActiveUserType(UserType type) const;
     bool checkUserExist(const char* username) const;
     Order& findOrder(const char* id);
+    void moveOrderToFinished(const char* id);
 
     void handoutOrders();
 public:

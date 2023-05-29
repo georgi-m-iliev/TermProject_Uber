@@ -220,7 +220,7 @@ void Uber::saveUsers(const char* filepath) {
 
     ofs << "type,username,password_hash,first_name,last_name,amount,car_number,phone_number,rating";
 
-    for(int i = 0; i < users.getSize(); i++) {
+    for(size_t i = 0; i < users.getSize(); i++) {
         ofs << '\n';
         ofs << (int)users[i]->getType() << ',';
         ofs << users[i]->getUsername() << ',';
@@ -247,7 +247,7 @@ void Uber::saveOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
     }
 
     ofs << "id,status,clientUsername,driverUsername,address,destination,passengers,minutes,amount";
-    for(int i = 0; i < col.getSize(); i++) {
+    for(size_t i = 0; i < col.getSize(); i++) {
         ofs << '\n';
         ofs << col[i]->getID() << ',';
         ofs << (int)col[i]->getStatus() << ',';
@@ -312,7 +312,7 @@ void Uber::checkActiveUserType(const UserType type) const {
 }
 
 bool Uber::checkUserExist(const char* username) const {
-    for(int i = 0; i < users.getSize(); i++) {
+    for(size_t i = 0; i < users.getSize(); i++) {
         if(strcmp(users[i]->getUsername().c_str(), username) == 0) {
             return true;
         }
@@ -321,17 +321,36 @@ bool Uber::checkUserExist(const char* username) const {
 }
 
 Order& Uber::findOrder(const char* id) {
-    for(int i = 0; i < activeOrders.getSize(); i++) {
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
         if(strcmp(activeOrders[i]->getID(), id) == 0) {
             return *activeOrders[i];
+        }
+    }
+    for(size_t i = 0; i < finishedOrders.getSize(); i++) {
+        if(strcmp(finishedOrders[i]->getID(), id) == 0) {
+            return *finishedOrders[i];
         }
     }
     throw std::runtime_error("Order with this ID was not found!");
 }
 
-// TODO: add move order to finished
+void Uber::moveOrderToFinished(const char* id) {
+    size_t ind = 0;
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
+        if(strcmp(activeOrders[i]->getID(), id) == 0) {
+            ind = i;
+            break;
+        }
+        if(ind == 0 && i == activeOrders.getSize() - 1) {
+            throw std::runtime_error("Order with this ID was not found!");
+        }
+    }
+    finishedOrders.push_back(std::move(activeOrders[ind]));
+    activeOrders.pop_at(ind);
+}
+
 void Uber::handoutOrders() {
-    for(int i = 0; i < activeOrders.getSize(); i++) {
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
         if(activeOrders[i]->getStatus() != OrderStatus::CREATED || activeOrders[i]->getDriver() != nullptr) {
             continue;
         }
@@ -370,7 +389,7 @@ void Uber::print() {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
     std::cout << "Company Net Earnings: " << netEarnings << std::endl;
-    for(int i = 0; i < activeOrders.getSize(); i++) {
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
         std::cout << *activeOrders[i] << std::endl;
     }
 }
@@ -441,7 +460,7 @@ void Uber::loginUser(std::stringstream& ss) {
     User* potentialUser = nullptr;
     char buffer[BUFFER_SIZE];
     ss.getline(buffer, BUFFER_SIZE, ' ');
-    for(int i = 0; i < users.getSize(); i++) {
+    for(size_t i = 0; i < users.getSize(); i++) {
         if(strcmp(users[i]->getUsername().c_str(), buffer) == 0) {
             potentialUser = &*users[i];
         }
@@ -541,7 +560,21 @@ void Uber::checkOrder(const char* id) {
     if(order.getClient() != activeUser && order.getDriver() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    std::cout << std::endl << order << std::endl;
+    std::cout << std::endl << order;
+    switch(activeUser->getType()) {
+        case UserType::Client: {
+            if(order.getDriver() != nullptr && order.getStatus() <= OrderStatus::AWAITING_DRIVER) {
+                return;
+            }
+            std::cout << "Driver: " << order.getDriver()->getFirstName() << " " << order.getDriver()->getLastName()
+                      << std::endl;
+            std::cout << "Car Number: " << order.getDriver()->getCarNumber() << std::endl;
+            std::cout << "Phone: " << order.getDriver()->getPhoneNumber() << std::endl;
+        } break;
+        case UserType::Driver: {
+            std::cout << "Client: " << order.getClient()->getFirstName() << " " << order.getClient()->getLastName() << std::endl;
+        } break;
+    }
 }
 
 void Uber::cancelOrder(const char* id) {
@@ -577,6 +610,8 @@ void Uber::payOrder(const char* id, double levas) {
     order.getClient()->withdrawAmount(levas);
     order.getDriver()->depositAmount(levas);
     netEarnings += order.getAmountInLeva();
+
+    std::cout << "Order paid successfully!" << std::endl;
 }
 
 void Uber::rateOrder(const char* id, short rating) {
@@ -596,6 +631,8 @@ void Uber::rateOrder(const char* id, short rating) {
     }
     order.rateDriver(rating);
     order.setStatus(OrderStatus::FINISHED);
+    moveOrderToFinished(order.getID());
+    std::cout << "Order rated successfully!" << std::endl;
 }
 
 void Uber::addMoney(double levas) {
@@ -605,9 +642,9 @@ void Uber::addMoney(double levas) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
     ((Client*) activeUser)->depositAmount(levas);
+    std::cout << "The deposit of " << levas << " was successful!" << std::endl;
 }
 
-// TODO: finish
 void Uber::changeAddress(std::stringstream& ss) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
@@ -647,14 +684,16 @@ void Uber::checkMessages() {
     handoutOrders();
     std::cout << std::endl <<  "-----------Driver messages from System!-----------" << std::endl;
     bool empty = true;
-    for(int i = 0; i < activeOrders.getSize(); i++) {
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
         if(activeOrders[i]->getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i]->getDriver() == activeUser) {
+            std::cout << "Client: "
+                << activeOrders[i]->getClient()->getFirstName() << " " << activeOrders[i]->getClient()->getLastName() << std::endl;
             std::cout << *activeOrders[i] << std::endl;
             empty = false;
         }
     }
     if(empty) {
-        std::cout << "                 No new messages!                 " << std::endl << std::endl;
+        std::cout << "                 No new messages!                 " << std::endl;
     }
 }
 
@@ -668,7 +707,7 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     order.setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
-    order.setAmount((size_t)(amount) / 100);
+    order.setAmount((size_t)(amount * 100));
     order.setMinutes(minutes);
     std::cout << "Order accepted successfully!" << std::endl;
 }

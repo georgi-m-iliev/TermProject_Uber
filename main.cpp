@@ -158,6 +158,7 @@ int main() {
             }
         }
         else if(strcmp(buffer, "accept_order") == 0) {
+            // TODO: fix reading errors
             ss.getline(buffer, BUFFER_SIZE, ' ');
             short minutes;
             ss >> minutes;
