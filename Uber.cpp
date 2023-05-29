@@ -320,6 +320,15 @@ bool Uber::checkUserExist(const char* username) const {
     return false;
 }
 
+Order& Uber::findOrder(const char* id) {
+    for(int i = 0; i < activeOrders.getSize(); i++) {
+        if(strcmp(activeOrders[i]->getID(), id) == 0) {
+            return *activeOrders[i];
+        }
+    }
+    throw std::runtime_error("Order with this ID was not found!");
+}
+
 void Uber::handoutOrders() {
     for(int i = 0; i < activeOrders.getSize(); i++) {
         if(activeOrders[i]->getStatus() != OrderStatus::CREATED || activeOrders[i]->getDriver() != nullptr) {
@@ -521,59 +530,46 @@ void Uber::order() {
 
 void Uber::checkOrder(const char* id) {
     checkUserLoggedIn();
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getClient() != activeUser && activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            std::cout << std::endl << *activeOrders[i] << std::endl;
-            return;
-        }
+    Order& order = findOrder(id);
+    if(order.getClient() != activeUser && order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    std::cout << std::endl << order << std::endl;
 }
 
 void Uber::cancelOrder(const char* id) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getClient() != activeUser && activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            if(activeOrders[i]->getStatus() > OrderStatus::ACCEPTED_BY_DRIVER) {
-                throw std::runtime_error("You can't cancel your order anymore!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::CANCELED);
-            std::cout << "Order has been canceled!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getClient() != activeUser && order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    if(order.getStatus() > OrderStatus::ACCEPTED_BY_DRIVER) {
+        throw std::runtime_error("You can't cancel your order anymore!");
+    }
+    order.setStatus(OrderStatus::CANCELED);
+    std::cout << "Order has been canceled!" << std::endl;
 }
 
 void Uber::payOrder(const char* id, double levas) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getClient() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            if(activeOrders[i]->getStatus() != OrderStatus::DESTINATION_REACHED) {
-                throw std::runtime_error("You can't pay at this moment!");
-            }
-            if(activeOrders[i]->getAmount() == (size_t)(levas * 100)) {
-                throw std::invalid_argument("The order amount is not the same as the pay amount!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::PAID);
-            activeOrders[i]->getClient()->withdrawAmount(levas);
-            activeOrders[i]->getDriver()->depositAmount(levas);
-            netEarnings += activeOrders[i]->getAmountInLeva();
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getClient() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    if(order.getStatus() != OrderStatus::DESTINATION_REACHED) {
+        throw std::runtime_error("You can't pay at this moment!");
+    }
+    if(order.getAmount() == (size_t)(levas * 100)) {
+        throw std::invalid_argument("The order amount is not the same as the pay amount!");
+    }
+    order.setStatus(OrderStatus::PAID);
+    order.getClient()->withdrawAmount(levas);
+    order.getDriver()->depositAmount(levas);
+    netEarnings += order.getAmountInLeva();
 }
 
 void Uber::rateOrder(const char* id, short rating) {
@@ -584,20 +580,15 @@ void Uber::rateOrder(const char* id, short rating) {
         throw std::invalid_argument("Rating can range from 0 to 5!");
     }
 
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getClient() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            if(activeOrders[i]->getStatus() != OrderStatus::AWAITING_RATING) {
-                throw std::runtime_error("You can't rate this order at this moment!");
-            }
-            activeOrders[i]->rateDriver(rating);
-            activeOrders[i]->setStatus(OrderStatus::FINISHED);
-            return;
-        }
+    Order& order = findOrder(id);
+    if(order.getClient() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    if(order.getStatus() != OrderStatus::AWAITING_RATING) {
+        throw std::runtime_error("You can't rate this order at this moment!");
+    }
+    order.rateDriver(rating);
+    order.setStatus(OrderStatus::FINISHED);
 }
 
 void Uber::addMoney(double levas) {
@@ -643,89 +634,69 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
     handoutOrders();
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getStatus() != OrderStatus::AWAITING_DRIVER || activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
-            activeOrders[i]->setAmount((size_t)(amount) / 100);
-            activeOrders[i]->setMinutes(minutes);
-            std::cout << "Order accepted successfully!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getStatus() != OrderStatus::AWAITING_DRIVER || order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    order.setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
+    order.setAmount((size_t)(amount) / 100);
+    order.setMinutes(minutes);
+    std::cout << "Order accepted successfully!" << std::endl;
 }
 
 void Uber::declineOrder(const char* id) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getStatus() != OrderStatus::ACCEPTED_BY_DRIVER || activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::CREATED);
-            activeOrders[i]->setAmount(0);
-            activeOrders[i]->setMinutes(0);
-            activeOrders[i]->setDriver(nullptr);
-            std::cout << "Order declined successfully!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getStatus() != OrderStatus::ACCEPTED_BY_DRIVER || order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    order.setStatus(OrderStatus::CREATED);
+    order.setAmount(0);
+    order.setMinutes(0);
+    order.setDriver(nullptr);
+    std::cout << "Order declined successfully!" << std::endl;
 }
 
 void Uber::pickupPassenger(const char* id) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getStatus() != OrderStatus::ACCEPTED_BY_DRIVER || activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::PASSENGER_PICKEDUP);
-            dynamic_cast<Driver*>(activeUser)->setCurrentLocation(activeOrders[i]->getAddress());
-            std::cout << "Passenger picked up recorded!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getStatus() != OrderStatus::ACCEPTED_BY_DRIVER || order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    order.setStatus(OrderStatus::PASSENGER_PICKEDUP);
+    dynamic_cast<Driver*>(activeUser)->setCurrentLocation(order.getAddress());
+    std::cout << "Passenger picked up recorded!" << std::endl;
 }
 
 void Uber::finishOrder(const char* id) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getStatus() != OrderStatus::PASSENGER_PICKEDUP || activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::DESTINATION_REACHED);
-            dynamic_cast<Driver*>(activeUser)->setCurrentLocation(activeOrders[i]->getDestination());
-            std::cout << "Order finished successfully!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getStatus() != OrderStatus::PASSENGER_PICKEDUP || order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    order.setStatus(OrderStatus::DESTINATION_REACHED);
+    dynamic_cast<Driver*>(activeUser)->setCurrentLocation(order.getDestination());
+    std::cout << "Order finished successfully!" << std::endl;
 }
 
 void Uber::acceptPayment(const char* id, double amount) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            if(activeOrders[i]->getStatus() != OrderStatus::PAID || activeOrders[i]->getDriver() != activeUser) {
-                throw std::runtime_error("You have no access to this order or action unavailable!");
-            }
-            if(std::abs(activeOrders[i]->getAmount() - amount) > std::numeric_limits<double>::epsilon()) {
-                throw std::invalid_argument("Invalid amount specified!");
-            }
-            activeOrders[i]->setStatus(OrderStatus::AWAITING_RATING);
-            std::cout << "Order payment accepted successfully!" << std::endl;
-            return;
-        }
+
+    Order& order = findOrder(id);
+    if(order.getStatus() != OrderStatus::PAID || order.getDriver() != activeUser) {
+        throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    throw std::runtime_error("Order with this ID was not found!");
+    if(std::abs(order.getAmount() - amount) > std::numeric_limits<double>::epsilon()) {
+        throw std::invalid_argument("Invalid amount specified!");
+    }
+    order.setStatus(OrderStatus::AWAITING_RATING);
+    std::cout << "Order payment accepted successfully!" << std::endl;
 }
