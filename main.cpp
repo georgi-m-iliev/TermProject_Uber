@@ -114,7 +114,7 @@ int main() {
         }
         else if(strcmp(buffer, "rate") == 0) {
             ss.getline(buffer, BUFFER_SIZE, ' ');
-            short value;
+            short value = 0;
             ss >> value;
             try {
                 service.rateOrder(buffer, value);
@@ -124,7 +124,7 @@ int main() {
             }
         }
         else if(strcmp(buffer, "add_money") == 0) {
-            double value;
+            double value = 0;
             ss >> value;
             try {
                 service.addMoney(value);
@@ -158,11 +158,10 @@ int main() {
             }
         }
         else if(strcmp(buffer, "accept_order") == 0) {
-            // TODO: fix reading errors
             ss.getline(buffer, BUFFER_SIZE, ' ');
-            short minutes;
+            short minutes = 0;
             ss >> minutes;
-            double amount;
+            double amount = 0;
             ss >> amount;
             ss.ignore(1);
             try {
@@ -201,7 +200,7 @@ int main() {
         }
         else if(strcmp(buffer, "accept_payment") == 0) {
             ss.getline(buffer, BUFFER_SIZE, ' ');
-            double amount;
+            double amount = 0;
             ss >> amount;
             ss.ignore(1);
             try {
