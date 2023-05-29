@@ -1,15 +1,7 @@
-// TODO: finish validation in constructor and operator >>
 #include "PhoneNumber.h"
-
 #include <cstring>
 
-PhoneNumber::PhoneNumber(): data{} {
-    data[0] = '\0';
-}
-
-PhoneNumber::PhoneNumber(const MyString &number): PhoneNumber(number.c_str()) {}
-
-PhoneNumber::PhoneNumber(const char* text): data{} {
+void PhoneNumber::validateAndSave(const char* text) {
     int length = (int)strlen(text);
     if(length + 1 > MAX_LENGTH) {
         throw std::invalid_argument("Phone number too long!");
@@ -29,6 +21,16 @@ PhoneNumber::PhoneNumber(const char* text): data{} {
     data[j] = '\0';
 }
 
+PhoneNumber::PhoneNumber(): data{} {
+    data[0] = '\0';
+}
+
+PhoneNumber::PhoneNumber(const MyString &number): PhoneNumber(number.c_str()) {}
+
+PhoneNumber::PhoneNumber(const char* text): data{} {
+    validateAndSave(text);
+}
+
 
 
 const char* PhoneNumber::c_str() const {
@@ -36,7 +38,9 @@ const char* PhoneNumber::c_str() const {
 }
 
 std::istream& operator>>(std::istream& is, PhoneNumber& number) {
-    is.getline(number.data, PhoneNumber::MAX_LENGTH);
+    char buffer[PhoneNumber::MAX_LENGTH];
+    is.getline(buffer, PhoneNumber::MAX_LENGTH);
+    number.validateAndSave(buffer);
     return is;
 }
 

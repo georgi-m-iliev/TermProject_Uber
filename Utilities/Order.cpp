@@ -91,6 +91,10 @@ const char* Order::getID() const {
     return id.c_str();
 }
 
+const MyString& Order::getID(bool) const {
+    return id;
+}
+
 OrderStatus Order::getStatus() const {
     return status;
 }
@@ -174,8 +178,7 @@ void Order::setAmount(size_t amount) {
 
 void Order::rateDriver(short rating) {
     if(this->driver == nullptr) {
-        //TODO: add path
-        return;
+        throw std::logic_error("Can't rate this order!");
     }
     driver->addRating(rating);
 }

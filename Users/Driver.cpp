@@ -1,4 +1,5 @@
 #include "Driver.h"
+#include <cstring>
 
 Driver::Driver(const char* username, const char* password, const char* firstName, const char* lastName,
                const char* carNumber, const char* phone):
@@ -46,11 +47,28 @@ void Driver::setRating(double rating) {
     this->rating = rating;
 }
 
-void Driver::addRating(int rating) const {
+void Driver::addRating(int rating) {
     this->rating += rating;
     this->rating /= 2.0;
 }
 
 UserType Driver::getType() const {
     return UserType::Driver;
+}
+
+void Driver::addDeclinedOrder(const char* id) {
+    declinedOrders.push_back(id);
+}
+
+void Driver::addDeclinedOrder(const MyString& id) {
+    declinedOrders.push_back(id);
+}
+
+bool Driver::isDeclined(const char* id) const {
+    for(int i = 0; i < declinedOrders.getSize(); i++) {
+        if(strcmp(declinedOrders[i].c_str(), id) == 0) {
+            return true;
+        }
+    }
+    return false;
 }

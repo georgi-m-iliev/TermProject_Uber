@@ -143,7 +143,7 @@ int main() {
         }
         else if(strcmp(buffer, "change_address") == 0) {
             try {
-                service.changeAddress();
+                service.changeAddress(ss);
             }
             catch(std::exception& ex) {
                 std::cout << ex.what() << std::endl;
@@ -214,5 +214,6 @@ int main() {
             std::cout << "Unknown command!" << std::endl;
             continue;
         }
+        std::cout << std::endl;
     }
 }

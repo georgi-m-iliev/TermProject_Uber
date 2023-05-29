@@ -13,20 +13,19 @@ class Uber {
 
     static double netEarnings;
 
+    void readUsers(const char* filepath);
+    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
+    void saveUsers(const char* filepath);
+    void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
     void load();
     void save();
+
     void checkUserLoggedIn(const char* message = nullptr) const;
     void checkActiveUserType(UserType type) const;
     bool checkUserExist(const char* username) const;
     Order& findOrder(const char* id);
 
-    void readUsers(const char* filepath);
-    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
-    void saveUsers(const char* filepath);
-    void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
-
     void handoutOrders();
-
 public:
     Uber();
     ~Uber();
@@ -46,7 +45,7 @@ public:
     void rateOrder(const char* id, short rating);
     void addMoney(double levas);
 
-    void changeAddress();
+    void changeAddress(std::stringstream& ss);
     void checkMessages();
     void acceptOrder(const char* id, short minutes, double amount);
     void declineOrder(const char* id);

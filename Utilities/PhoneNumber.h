@@ -1,10 +1,11 @@
 #pragma once
 #include "MyString.h"
 
-struct PhoneNumber {
+class PhoneNumber {
     static const int MAX_LENGTH = 20;
     char data[MAX_LENGTH];
 
+    void validateAndSave(const char* text);
 public:
     PhoneNumber();
     PhoneNumber(const MyString& number);

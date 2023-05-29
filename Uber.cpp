@@ -329,15 +329,19 @@ Order& Uber::findOrder(const char* id) {
     throw std::runtime_error("Order with this ID was not found!");
 }
 
+// TODO: add move order to finished
 void Uber::handoutOrders() {
     for(int i = 0; i < activeOrders.getSize(); i++) {
         if(activeOrders[i]->getStatus() != OrderStatus::CREATED || activeOrders[i]->getDriver() != nullptr) {
             continue;
         }
         double minDistance = std::numeric_limits<double>::max();
-        size_t minInd = 0;
+        int minInd = -1;
         for(int j = 0; j < users.getSize(); j++) {
             if(users[j]->getType() == UserType::Client) {
+                continue;
+            }
+            if(dynamic_cast<Driver*>(&*users[j])->isDeclined(activeOrders[i]->getID())) {
                 continue;
             }
             double currentDistance = distanceBtwn(activeOrders[i]->getAddress(), static_cast<Driver*>(&*users[j])->getCurrentLocation());
@@ -345,6 +349,9 @@ void Uber::handoutOrders() {
                 minDistance = currentDistance;
                 minInd = j;
             }
+        }
+        if(minInd == -1) {
+            continue;
         }
         activeOrders[i]->setDriver(static_cast<Driver*>(&*users[minInd]));
         activeOrders[i]->setStatus(OrderStatus::AWAITING_DRIVER);
@@ -450,9 +457,9 @@ void Uber::loginUser(std::stringstream& ss) {
     }
     std::cout << "Login successful!" << std::endl;
     activeUser = potentialUser;
-    if(dynamic_cast<Driver*>(&*activeUser)) {
-        checkMessages();
-    }
+//    if(dynamic_cast<Driver*>(&*activeUser)) {
+//        checkMessages();
+//    }
 }
 
 void Uber::logoutUser() {
@@ -601,16 +608,37 @@ void Uber::addMoney(double levas) {
 }
 
 // TODO: finish
-void Uber::changeAddress() {
+void Uber::changeAddress(std::stringstream& ss) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Driver);
+
+    [[maybe_unused]] static char *messages[] = {(char*)"Name?", (char*)"X?", (char*)"Y?"};
     char name[BUFFER_SIZE];
     int x, y;
-    std::cin.getline(name, BUFFER_SIZE);
-    std::cin >> x;
-    std::cin >> y;
+    for(int i = 0; i < sizeof(messages) / sizeof(char*); i++) {
+        if(ss.eof()) {
+            throw std::runtime_error("Command syntax invalid!");
+        }
+        switch(i) {
+            case 0:
+                ss.getline(name, BUFFER_SIZE, ' ');
+                break;
+            case 1:
+                ss >> x;
+                ss.ignore(1);
+                break;
+            case 2:
+                ss >> y;
+                ss.ignore(1);
+                break;
+        }
+    }
+    if(!ss.eof()) {
+        throw std::runtime_error("Command syntax invalid!");
+    }
 
     dynamic_cast<Driver*>(activeUser)->setCurrentLocation(name, x, y);
+    std::cout << "Location changes successfully!" << std::endl;
 }
 
 void Uber::checkMessages() {
@@ -650,13 +678,14 @@ void Uber::declineOrder(const char* id) {
     checkActiveUserType(UserType::Driver);
 
     Order& order = findOrder(id);
-    if(order.getStatus() != OrderStatus::ACCEPTED_BY_DRIVER || order.getDriver() != activeUser) {
+    if(order.getStatus() > OrderStatus::ACCEPTED_BY_DRIVER || order.getDriver() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     order.setStatus(OrderStatus::CREATED);
     order.setAmount(0);
     order.setMinutes(0);
     order.setDriver(nullptr);
+    dynamic_cast<Driver*>(activeUser)->addDeclinedOrder(order.getID(true));
     std::cout << "Order declined successfully!" << std::endl;
 }
 

@@ -40,6 +40,7 @@ public:
           const Location& address, const Location& destination, short passengers, short minutes, size_t amount);
 
     const char* getID() const;
+    const MyString& getID(bool) const;
     OrderStatus getStatus() const;
     const Client* getClient() const;
     const Driver* getDriver() const;
