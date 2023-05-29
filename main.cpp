@@ -157,14 +157,6 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
-        else if(strcmp(buffer, "print") == 0) {
-            try {
-                service.print();
-            }
-            catch(std::exception& ex) {
-                std::cout << ex.what() << std::endl;
-            }
-        }
         else if(strcmp(buffer, "accept_order") == 0) {
             ss.getline(buffer, BUFFER_SIZE, ' ');
             short minutes;

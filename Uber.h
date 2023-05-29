@@ -9,7 +9,6 @@ class Uber {
     vector<SharedPtr<User>> users;
     vector<SharedPtr<Order>> activeOrders;
     vector<SharedPtr<Order>> finishedOrders;
-
     User* activeUser;
 
     static double netEarnings;
@@ -24,20 +23,22 @@ class Uber {
     void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
     void saveUsers(const char* filepath);
     void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
+
     void handoutOrders();
 
 public:
     Uber();
     ~Uber();
 
+    void print();
+
     void registerUser(UserType type, std::stringstream& ss);
     void loginUser(std::stringstream& ss);
     void logoutUser();
     void changePassword(const char* password);
-    void whoami() const;
 
+    void whoami() const;
     void order();
-    void print();
     void checkOrder(const char* id);
     void cancelOrder(const char* id);
     void payOrder(const char* id, double levas);

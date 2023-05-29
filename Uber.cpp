@@ -350,6 +350,15 @@ Uber::~Uber() {
     save();
 }
 
+void Uber::print() {
+    checkUserLoggedIn();
+    checkActiveUserType(UserType::Driver);
+    std::cout << "Company Net Earnings: " << netEarnings << std::endl;
+    for(int i = 0; i < activeOrders.getSize(); i++) {
+        std::cout << *activeOrders[i] << std::endl;
+    }
+}
+
 void Uber::registerUser(const UserType type, std::stringstream& ss) {
     if(activeUser != nullptr) {
         throw std::runtime_error("You cannot register, while being logged in!");
@@ -510,15 +519,6 @@ void Uber::order() {
     activeOrders.push_back(SharedPtr<Order>(new Order(std::move(order))));
 }
 
-void Uber::print() {
-    if(activeUser->getType() == UserType::Driver) {
-        std::cout << "Company Net Earnings: " << netEarnings << std::endl;
-    }
-    for(int i = 0; i < activeOrders.getSize(); i++) {
-        std::cout << *activeOrders[i] << std::endl;
-    }
-}
-
 void Uber::checkOrder(const char* id) {
     checkUserLoggedIn();
     for(int i = 0; i < activeOrders.getSize(); i++) {
@@ -579,6 +579,11 @@ void Uber::payOrder(const char* id, double levas) {
 void Uber::rateOrder(const char* id, short rating) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
+
+    if(rating < 0 || rating > 5) {
+        throw std::invalid_argument("Rating can range from 0 to 5!");
+    }
+
     for(int i = 0; i < activeOrders.getSize(); i++) {
         if(strcmp(activeOrders[i]->getID(), id) == 0) {
             if(activeOrders[i]->getClient() != activeUser) {
