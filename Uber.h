@@ -12,9 +12,10 @@ class Uber {
     User* activeUser;
 
     static double netEarnings;
+    static MyString path;
 
     void readUsers(const char* filepath);
-    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col);
+    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool addNet);
     void saveUsers(const char* filepath);
     void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
     void load();
@@ -29,6 +30,7 @@ class Uber {
     void handoutOrders();
 public:
     Uber();
+    Uber(const char* _path);
     ~Uber();
 
     void print();

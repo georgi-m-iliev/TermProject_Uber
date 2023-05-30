@@ -100,7 +100,7 @@ void Uber::readUsers(const char* filepath) {
     ifs.close();
 }
 
-void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
+void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool addNet) {
     std::ifstream ifs(filepath, std::ios::in);
     if(!ifs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
@@ -167,7 +167,9 @@ void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
                 driver = dynamic_cast<Driver*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is deleted
             }
         }
-        netEarnings += (double)amount / 100.0;
+        if(addNet) {
+            netEarnings += (double)amount / 100.0;
+        }
         col.push_back(SharedPtr<Order>(new Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount)));
     }
 
@@ -563,7 +565,7 @@ void Uber::checkOrder(const char* id) {
     std::cout << std::endl << order;
     switch(activeUser->getType()) {
         case UserType::Client: {
-            if(order.getDriver() != nullptr && order.getStatus() <= OrderStatus::AWAITING_DRIVER) {
+            if(order.getDriver() == nullptr && order.getStatus() <= OrderStatus::AWAITING_DRIVER) {
                 return;
             }
             std::cout << "Driver: " << order.getDriver()->getFirstName() << " " << order.getDriver()->getLastName()
