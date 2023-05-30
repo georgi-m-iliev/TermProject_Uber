@@ -6,13 +6,14 @@
 #include "Utilities/Order.h"
 
 class Uber {
+    MyString path;
+
     vector<SharedPtr<User>> users;
     vector<SharedPtr<Order>> activeOrders;
     vector<SharedPtr<Order>> finishedOrders;
-    User* activeUser;
 
+    User* activeUser;
     static double netEarnings;
-    static MyString path;
 
     void readUsers(const char* filepath);
     void readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool addNet);
@@ -25,6 +26,7 @@ class Uber {
     void checkActiveUserType(UserType type) const;
     bool checkUserExist(const char* username) const;
     Order& findOrder(const char* id);
+    const Order& findOrder(const char* id) const;
     void moveOrderToFinished(const char* id);
 
     void handoutOrders();
@@ -42,7 +44,7 @@ public:
 
     void whoami() const;
     void order();
-    void checkOrder(const char* id);
+    void checkOrder(const char* id) const;
     void cancelOrder(const char* id);
     void payOrder(const char* id, double levas);
     void rateOrder(const char* id, short rating);

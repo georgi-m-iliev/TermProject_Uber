@@ -5,6 +5,8 @@
 #include <limits>
 
 const int BUFFER_SIZE = 256;
+const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
+
 double Uber::netEarnings = 0;
 
 void Uber::readUsers(const char* filepath) {
@@ -178,7 +180,7 @@ void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool 
 
 void Uber::load() {
     try {
-        readUsers(R"(D:\Workspace\FMI\OOP_TermProject_Uber\users.csv)");
+        readUsers((path + "users.csv").c_str());
     }
     catch(std::exception& ex) {
         std::cout << "Problem with users file!" << " ";
@@ -194,8 +196,8 @@ void Uber::load() {
         std::cout << " " << "Continuing without saved users!" << std::endl;
     }
     try {
-        readOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\active_orders.csv)", activeOrders);
-        readOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\finished_orders.csv)", finishedOrders);
+        readOrders((path + "active_orders.csv").c_str(), activeOrders, false);
+        readOrders((path + "finished_orders.csv").c_str(), finishedOrders, true);
     }
     catch(std::exception& ex) {
         std::cout << "Problem with orders file!" << " ";
@@ -272,7 +274,7 @@ void Uber::saveOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
 
 void Uber::save() {
     try {
-        saveUsers(R"(D:\Workspace\FMI\OOP_TermProject_Uber\users.csv)");
+        saveUsers((path + "users.csv").c_str());
     }
     catch(std::exception& ex) {
         std::cout << "Problem with saving users!" << " ";
@@ -280,12 +282,12 @@ void Uber::save() {
             std::cout << ex.what();
         }
         else {
-            std::cout << "Loading from file was unsuccessful!";
+            std::cout << "Saving from file was unsuccessful!";
         }
     }
     try {
-        saveOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\active_orders.csv)", activeOrders);
-        saveOrders(R"(D:\Workspace\FMI\OOP_TermProject_Uber\finished_orders.csv)", finishedOrders);
+        saveOrders((path + "active_orders.csv").c_str(), activeOrders);
+        saveOrders((path + "finished_orders.csv").c_str(), finishedOrders);
     }
     catch(std::exception& ex) {
         std::cout << "Problem with saving orders!" << " ";
@@ -293,7 +295,7 @@ void Uber::save() {
             std::cout << ex.what();
         }
         else {
-            std::cout << "Loading from file was unsuccessful!";
+            std::cout << "Saving from file was unsuccessful!";
         }
     }
 }
@@ -323,6 +325,20 @@ bool Uber::checkUserExist(const char* username) const {
 }
 
 Order& Uber::findOrder(const char* id) {
+    for(size_t i = 0; i < activeOrders.getSize(); i++) {
+        if(strcmp(activeOrders[i]->getID(), id) == 0) {
+            return *activeOrders[i];
+        }
+    }
+    for(size_t i = 0; i < finishedOrders.getSize(); i++) {
+        if(strcmp(finishedOrders[i]->getID(), id) == 0) {
+            return *finishedOrders[i];
+        }
+    }
+    throw std::runtime_error("Order with this ID was not found!");
+}
+
+const Order& Uber::findOrder(const char* id) const {
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
         if(strcmp(activeOrders[i]->getID(), id) == 0) {
             return *activeOrders[i];
@@ -379,7 +395,9 @@ void Uber::handoutOrders() {
     }
 }
 
-Uber::Uber(): activeUser(nullptr) {
+Uber::Uber(): Uber(DEFAULT_PATH) {}
+
+Uber::Uber(const char* path): activeUser(nullptr), path(path) {
     load();
 }
 
@@ -556,9 +574,9 @@ void Uber::order() {
     activeOrders.push_back(SharedPtr<Order>(new Order(std::move(order))));
 }
 
-void Uber::checkOrder(const char* id) {
+void Uber::checkOrder(const char* id) const {
     checkUserLoggedIn();
-    Order& order = findOrder(id);
+    const Order& order = findOrder(id);
     if(order.getClient() != activeUser && order.getDriver() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }

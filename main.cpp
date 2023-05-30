@@ -26,7 +26,7 @@ int main() {
                 try {
                     service.registerUser(UserType::Client, ss);
                 }
-                catch(std::exception& ex) {
+                catch(const std::exception& ex) {
                     std::cout << ex.what() << std::endl;
                 }
             }
@@ -34,7 +34,7 @@ int main() {
                 try {
                     service.registerUser(UserType::Driver, ss);
                 }
-                catch(std::exception& ex) {
+                catch(const std::exception& ex) {
                     std::cout << ex.what() << std::endl;
                 }
             }
@@ -46,7 +46,7 @@ int main() {
             try {
                 service.loginUser(ss);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -54,7 +54,7 @@ int main() {
             try {
                 service.logoutUser();
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -63,7 +63,7 @@ int main() {
             try {
                 service.changePassword(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -71,7 +71,7 @@ int main() {
             try {
                 service.whoami();
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -79,7 +79,7 @@ int main() {
             try {
                 service.order();
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -88,7 +88,7 @@ int main() {
             try {
                 service.checkOrder(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -97,7 +97,7 @@ int main() {
             try {
                 service.cancelOrder(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -108,7 +108,7 @@ int main() {
             try {
                 service.payOrder(buffer, value);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -119,7 +119,7 @@ int main() {
             try {
                 service.rateOrder(buffer, value);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -129,7 +129,7 @@ int main() {
             try {
                 service.addMoney(value);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -137,7 +137,7 @@ int main() {
             try {
                 service.print();
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -145,7 +145,7 @@ int main() {
             try {
                 service.changeAddress(ss);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -153,7 +153,7 @@ int main() {
             try {
                 service.checkMessages();
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -167,7 +167,7 @@ int main() {
             try {
                 service.acceptOrder(buffer, minutes, amount);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -176,7 +176,7 @@ int main() {
             try {
                 service.declineOrder(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -185,7 +185,7 @@ int main() {
             try {
                 service.pickupPassenger(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -194,7 +194,7 @@ int main() {
             try {
                 service.finishOrder(buffer);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -206,7 +206,7 @@ int main() {
             try {
                 service.acceptPayment(buffer, amount);
             }
-            catch(std::exception& ex) {
+            catch(const std::exception& ex) {
                 std::cout << ex.what() << std::endl;
             }
         }

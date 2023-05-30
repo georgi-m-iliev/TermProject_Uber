@@ -24,7 +24,7 @@ namespace {
 
 void Order::calcID() {
     static size_t EPOCH_START = 1684108800;
-    char str[20];
+    char str[100];
     size_t seconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
     seconds -= EPOCH_START;
     numToStr(seconds, str);
@@ -34,8 +34,9 @@ void Order::calcID() {
             str[i] += 'A' - '0';
         }
         else if(i % 3 == 0) {
-            str[i] -= 8;
-            str[i] += absInt(address.getPoint().x - address.getPoint().y);
+            str[i] += 'f';
+            str[i] -= 2;
+            str[i] += absInt(address.getPoint().x - address.getPoint().y) % 10;
         }
         else {
             str[i] += 'a' - '0';

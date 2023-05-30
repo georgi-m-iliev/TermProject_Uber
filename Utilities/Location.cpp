@@ -1,7 +1,3 @@
-//
-// Created by georgi on 4.5.2023 г..
-//
-
 #include "Location.h"
 #include <cmath>
 
