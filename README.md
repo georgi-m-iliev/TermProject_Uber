@@ -38,3 +38,21 @@ pickup_passengers <id>
 finish_order <id>
 accept_payment <id> <amount>
 ```
+
+## Example order workflow
+
+```mermaid
+flowchart TB
+    A[Start] --> B[login] & B2[register]
+    B --Driver--> C[change_address];
+    B --Client--> D[order];
+    D --Order info printed--> E[check_order < id >] --Get info about wait time, amount and driver--> J[add_money < amount >] --Add money to pay--> M[pay < id > < amount >] --After payment is accepted, rating can be added--> N[rate < id > < rating>];
+    C --Current location to get nearest orders--> F[check_messages] --Accept order--> G[accept_order < id >] --Arrived at address--> H[pickup_passengers] --Destination reached--> I[finish_order] --Waiting for payment--> K[accept_payment < id > < amount >];
+    F --Deny order--> L[deny_order];
+    
+    D -.-> C -.-> F -.-> G -.-> E -.-> H -.-> I -.-> M -.-> K -.-> N;
+
+    K & N --> X[exit]
+```
+
+###### Solid line indicates sequence of user action, dotted line indicates sequence of actions in time
