@@ -1,6 +1,5 @@
 #include "User.h"
 #include "../Security/SHA256.h"
-#include <cstring>
 
 User::User(const char* username, const char* password, const char* firstName, const char* lastName) :
         username(username), passwordHash(SHA256::calculate(password)),

@@ -569,7 +569,6 @@ void Uber::order() {
 
     order.setClient((Client*)activeUser);
     order.setStatus(OrderStatus::CREATED);
-    order.calcID();
     std::cout << order;
     activeOrders.push_back(SharedPtr<Order>(new Order(std::move(order))));
 }
@@ -616,6 +615,10 @@ void Uber::payOrder(const char* id, double levas) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
 
+    if(activeUser->getBalance() < (size_t)(levas * 100)) {
+        throw std::runtime_error("You don't have enough balance to pay this order!\nPlease use the deposit functionality!");
+    }
+
     Order& order = findOrder(id);
     if(order.getClient() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
@@ -623,7 +626,7 @@ void Uber::payOrder(const char* id, double levas) {
     if(order.getStatus() != OrderStatus::DESTINATION_REACHED) {
         throw std::runtime_error("You can't pay at this moment!");
     }
-    if(order.getAmount() == (size_t)(levas * 100)) {
+    if(order.getAmount() != (size_t)(levas * 100)) {
         throw std::invalid_argument("The order amount is not the same as the pay amount!");
     }
     order.setStatus(OrderStatus::PAID);
@@ -782,7 +785,7 @@ void Uber::acceptPayment(const char* id, double amount) {
     if(order.getStatus() != OrderStatus::PAID || order.getDriver() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    if(std::abs(order.getAmount() - amount) > std::numeric_limits<double>::epsilon()) {
+    if(order.getAmount() != (size_t)(amount * 100)) {
         throw std::invalid_argument("Invalid amount specified!");
     }
     order.setStatus(OrderStatus::AWAITING_RATING);

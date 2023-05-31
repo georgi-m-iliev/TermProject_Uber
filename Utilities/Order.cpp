@@ -34,7 +34,7 @@ void Order::calcID() {
             str[i] += 'A' - '0';
         }
         else if(i % 3 == 0) {
-            str[i] += 'f';
+            str[i] += 'f' - '0';
             str[i] -= 2;
             str[i] += absInt(address.getPoint().x - address.getPoint().y) % 10;
         }
@@ -154,6 +154,7 @@ void Order::setAddress(const char* name, int x, int y, const char* note) {
     if(strlen(note) != 0) {
         address.setNote(note);
     }
+    calcID();
 }
 
 void Order::setDestination(const char* name, int x, int y, const char* note) {
@@ -166,7 +167,6 @@ void Order::setDestination(const char* name, int x, int y, const char* note) {
 
 void Order::setPassengers(short passengers) {
     this->passengers = passengers;
-    calcID();
 }
 
 void Order::setMinutes(short minutes) {

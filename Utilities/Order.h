@@ -28,6 +28,7 @@ class Order {
     short minutes;
     size_t amount;
 
+    void calcID();
 public:
     Order();
     Order(const char* addressName, int addressX, int addressY,
@@ -38,7 +39,6 @@ public:
           short passengers);
     Order(const char* id, OrderStatus status, Client* client, Driver* driver,
           const Location& address, const Location& destination, short passengers, short minutes, size_t amount);
-
     const char* getID() const;
     const MyString& getID(bool) const;
     OrderStatus getStatus() const;
@@ -51,8 +51,8 @@ public:
     short getPassengers() const;
     short getMinutes() const;
     size_t getAmount() const;
-    double getAmountInLeva() const;
 
+    double getAmountInLeva() const;
     void setStatus(OrderStatus status);
     void setClient(Client* client);
     void setDriver(Driver* driver);
@@ -61,11 +61,10 @@ public:
     void setPassengers(short passengers);
     void setMinutes(short minutes);
     void setAmount(size_t amount);
-    void rateDriver(short rating);
 
+    void rateDriver(short rating);
 //    friend class Uber;
     friend std::ostream& operator<<(std::ostream& os, const Order& order);
-    void calcID();
 };
 
 std::ostream& operator<<(std::ostream& os, const Order& order);
