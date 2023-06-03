@@ -88,6 +88,10 @@ Order::Order(const char* id, const OrderStatus status, Client* client, Driver* d
     this->minutes = minutes;
 }
 
+Order* Order::clone() const {
+    return new Order(*this);
+}
+
 const char* Order::getID() const {
     return id.c_str();
 }

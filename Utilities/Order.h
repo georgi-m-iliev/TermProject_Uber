@@ -39,6 +39,9 @@ public:
           short passengers);
     Order(const char* id, OrderStatus status, Client* client, Driver* driver,
           const Location& address, const Location& destination, short passengers, short minutes, size_t amount);
+
+    Order* clone() const;
+
     const char* getID() const;
     const MyString& getID(bool) const;
     OrderStatus getStatus() const;

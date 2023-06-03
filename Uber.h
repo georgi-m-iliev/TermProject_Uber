@@ -5,20 +5,23 @@
 #include "Users/Driver.h"
 #include "Utilities/Order.h"
 
+const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
+
+
 class Uber {
     MyString path;
 
-    vector<SharedPtr<User>> users;
-    vector<SharedPtr<Order>> activeOrders;
-    vector<SharedPtr<Order>> finishedOrders;
+    vector<ObjPointer<User>> users;
+    vector<ObjPointer<Order>> activeOrders;
+    vector<ObjPointer<Order>> finishedOrders;
 
     User* activeUser;
-    static double netEarnings;
+    double netEarnings;
 
     void readUsers(const char* filepath);
-    void readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool addNet);
+    void readOrders(const char* filepath, vector<ObjPointer<Order>>& col, bool addNet);
     void saveUsers(const char* filepath);
-    void saveOrders(const char* filepath, vector<SharedPtr<Order>>& col);
+    void saveOrders(const char* filepath, vector<ObjPointer<Order>>& col);
     void load();
     void save();
 
@@ -33,6 +36,7 @@ class Uber {
 public:
     Uber();
     Uber(const char* _path);
+    Uber(const Uber& other);
     ~Uber();
 
     void print();

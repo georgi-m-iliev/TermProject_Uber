@@ -5,9 +5,6 @@
 #include <limits>
 
 const int BUFFER_SIZE = 256;
-const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
-
-double Uber::netEarnings = 0;
 
 void Uber::readUsers(const char* filepath) {
     std::ifstream ifs(filepath, std::ios::in);
@@ -54,7 +51,7 @@ void Uber::readUsers(const char* filepath) {
             client.setFirstName(buffer2[2]);
             client.setLastName(buffer2[3]);
             client.setBalance(amount);
-            users.push_back(SharedPtr<User>(new Client(std::move(client))));
+            users.push_back(ObjPointer<User>(new Client(std::move(client))));
         }
         else if(strcmp(buffer, "1") == 0) {
             //this is driver
@@ -95,14 +92,14 @@ void Uber::readUsers(const char* filepath) {
             driver.setPhoneNumber(buffer2[5]);
             driver.setRating(rating);
 
-            users.push_back(SharedPtr<User>(new Driver(std::move(driver))));
+            users.push_back(ObjPointer<User>(new Driver(std::move(driver))));
         }
     }
 
     ifs.close();
 }
 
-void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool addNet) {
+void Uber::readOrders(const char* filepath, vector<ObjPointer<Order>>& col, bool addNet) {
     std::ifstream ifs(filepath, std::ios::in);
     if(!ifs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
@@ -172,7 +169,7 @@ void Uber::readOrders(const char* filepath, vector<SharedPtr<Order>>& col, bool 
         if(addNet) {
             netEarnings += (double)amount / 100.0;
         }
-        col.push_back(SharedPtr<Order>(new Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount)));
+        col.push_back(ObjPointer<Order>(new Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount)));
     }
 
     ifs.close();
@@ -244,7 +241,7 @@ void Uber::saveUsers(const char* filepath) {
     ofs.close();
 }
 
-void Uber::saveOrders(const char* filepath, vector<SharedPtr<Order>>& col) {
+void Uber::saveOrders(const char* filepath, vector<ObjPointer<Order>>& col) {
     std::ofstream ofs(filepath, std::ios::out | std::ios::trunc);
     if(!ofs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
@@ -395,11 +392,19 @@ void Uber::handoutOrders() {
     }
 }
 
-Uber::Uber(): Uber(DEFAULT_PATH) {}
+Uber::Uber(): Uber(DEFAULT_PATH) {
+    activeUser = nullptr;
+    netEarnings = 0;
+}
 
 Uber::Uber(const char* path): activeUser(nullptr), path(path) {
     load();
 }
+
+Uber::Uber(const Uber& other): path(other.path), users(other.users), activeOrders(other.activeOrders), finishedOrders(other.finishedOrders) {
+    activeUser = nullptr;
+}
+
 
 Uber::~Uber() {
     save();
@@ -439,7 +444,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
                 throw std::runtime_error("User with the same username already exists!");
             }
 
-            users.push_back(SharedPtr<User>(
+            users.push_back(ObjPointer<User>(
                     new Client(buffer[0], buffer[1], buffer[2], buffer[3])
             ));
         } break;
@@ -462,7 +467,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
-            users.push_back(SharedPtr<User>(
+            users.push_back(ObjPointer<User>(
             new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
             ));
         } break;
@@ -570,7 +575,7 @@ void Uber::order() {
     order.setClient((Client*)activeUser);
     order.setStatus(OrderStatus::CREATED);
     std::cout << order;
-    activeOrders.push_back(SharedPtr<Order>(new Order(std::move(order))));
+    activeOrders.push_back(ObjPointer<Order>(new Order(std::move(order))));
 }
 
 void Uber::checkOrder(const char* id) const {
