@@ -12,16 +12,16 @@ class Uber {
     MyString path;
 
     vector<ObjPointer<User>> users;
-    vector<ObjPointer<Order>> activeOrders;
-    vector<ObjPointer<Order>> finishedOrders;
+    vector<Order> activeOrders;
+    vector<Order> finishedOrders;
 
     User* activeUser;
     double netEarnings;
 
     void readUsers(const char* filepath);
-    void readOrders(const char* filepath, vector<ObjPointer<Order>>& col, bool addNet);
+    void readOrders(const char* filepath, vector<Order>& col, bool addNet);
     void saveUsers(const char* filepath);
-    void saveOrders(const char* filepath, vector<ObjPointer<Order>>& col);
+    void saveOrders(const char* filepath, vector<Order>& col);
     void load();
     void save();
 

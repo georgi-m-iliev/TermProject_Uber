@@ -99,7 +99,7 @@ void Uber::readUsers(const char* filepath) {
     ifs.close();
 }
 
-void Uber::readOrders(const char* filepath, vector<ObjPointer<Order>>& col, bool addNet) {
+void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
     std::ifstream ifs(filepath, std::ios::in);
     if(!ifs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
@@ -169,7 +169,7 @@ void Uber::readOrders(const char* filepath, vector<ObjPointer<Order>>& col, bool
         if(addNet) {
             netEarnings += (double)amount / 100.0;
         }
-        col.push_back(ObjPointer<Order>(new Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount)));
+        col.push_back(Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount));
     }
 
     ifs.close();
@@ -241,7 +241,7 @@ void Uber::saveUsers(const char* filepath) {
     ofs.close();
 }
 
-void Uber::saveOrders(const char* filepath, vector<ObjPointer<Order>>& col) {
+void Uber::saveOrders(const char* filepath, vector<Order>& col) {
     std::ofstream ofs(filepath, std::ios::out | std::ios::trunc);
     if(!ofs.is_open()) {
         throw std::runtime_error("File couldn't be opened!");
@@ -250,20 +250,20 @@ void Uber::saveOrders(const char* filepath, vector<ObjPointer<Order>>& col) {
     ofs << "id,status,clientUsername,driverUsername,address,destination,passengers,minutes,amount";
     for(size_t i = 0; i < col.getSize(); i++) {
         ofs << '\n';
-        ofs << col[i]->getID() << ',';
-        ofs << (int)col[i]->getStatus() << ',';
-        ofs << col[i]->getClient()->getUsername() << ',';
-        if(col[i]->getDriver()) {
-            ofs << col[i]->getDriver()->getUsername() << ',';
+        ofs << col[i].getID() << ',';
+        ofs << (int)col[i].getStatus() << ',';
+        ofs << col[i].getClient()->getUsername() << ',';
+        if(col[i].getDriver()) {
+            ofs << col[i].getDriver()->getUsername() << ',';
         }
         else {
             ofs << "NULL" << ',';
         }
-        ofs << col[i]->getAddress().getName() << " " << col[i]->getAddress().getPoint().x << " " << col[i]->getAddress().getPoint().y <<  ',';
-        ofs << col[i]->getDestination().getName() << " " << col[i]->getDestination().getPoint().x << " " << col[i]->getDestination().getPoint().y <<  ',';
-        ofs << col[i]->getPassengers() << ',';
-        ofs << col[i]->getMinutes() << ',';
-        ofs << col[i]->getAmount();
+        ofs << col[i].getAddress().getName() << " " << col[i].getAddress().getPoint().x << " " << col[i].getAddress().getPoint().y <<  ',';
+        ofs << col[i].getDestination().getName() << " " << col[i].getDestination().getPoint().x << " " << col[i].getDestination().getPoint().y <<  ',';
+        ofs << col[i].getPassengers() << ',';
+        ofs << col[i].getMinutes() << ',';
+        ofs << col[i].getAmount();
     }
 
     ofs.close();
@@ -323,13 +323,13 @@ bool Uber::checkUserExist(const char* username) const {
 
 Order& Uber::findOrder(const char* id) {
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            return *activeOrders[i];
+        if(strcmp(activeOrders[i].getID(), id) == 0) {
+            return activeOrders[i];
         }
     }
     for(size_t i = 0; i < finishedOrders.getSize(); i++) {
-        if(strcmp(finishedOrders[i]->getID(), id) == 0) {
-            return *finishedOrders[i];
+        if(strcmp(finishedOrders[i].getID(), id) == 0) {
+            return finishedOrders[i];
         }
     }
     throw std::runtime_error("Order with this ID was not found!");
@@ -337,13 +337,13 @@ Order& Uber::findOrder(const char* id) {
 
 const Order& Uber::findOrder(const char* id) const {
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
-            return *activeOrders[i];
+        if(strcmp(activeOrders[i].getID(), id) == 0) {
+            return activeOrders[i];
         }
     }
     for(size_t i = 0; i < finishedOrders.getSize(); i++) {
-        if(strcmp(finishedOrders[i]->getID(), id) == 0) {
-            return *finishedOrders[i];
+        if(strcmp(finishedOrders[i].getID(), id) == 0) {
+            return finishedOrders[i];
         }
     }
     throw std::runtime_error("Order with this ID was not found!");
@@ -352,7 +352,7 @@ const Order& Uber::findOrder(const char* id) const {
 void Uber::moveOrderToFinished(const char* id) {
     size_t ind = 0;
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(strcmp(activeOrders[i]->getID(), id) == 0) {
+        if(strcmp(activeOrders[i].getID(), id) == 0) {
             ind = i;
             break;
         }
@@ -366,7 +366,7 @@ void Uber::moveOrderToFinished(const char* id) {
 
 void Uber::handoutOrders() {
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(activeOrders[i]->getStatus() != OrderStatus::CREATED || activeOrders[i]->getDriver() != nullptr) {
+        if(activeOrders[i].getStatus() != OrderStatus::CREATED || activeOrders[i].getDriver() != nullptr) {
             continue;
         }
         double minDistance = std::numeric_limits<double>::max();
@@ -375,10 +375,10 @@ void Uber::handoutOrders() {
             if(users[j]->getType() == UserType::Client) {
                 continue;
             }
-            if(dynamic_cast<Driver*>(&*users[j])->isDeclined(activeOrders[i]->getID())) {
+            if(dynamic_cast<Driver*>(&*users[j])->isDeclined(activeOrders[i].getID())) {
                 continue;
             }
-            double currentDistance = distanceBtwn(activeOrders[i]->getAddress(), static_cast<Driver*>(&*users[j])->getCurrentLocation());
+            double currentDistance = distanceBtwn(activeOrders[i].getAddress(), static_cast<Driver*>(&*users[j])->getCurrentLocation());
             if(currentDistance < minDistance) {
                 minDistance = currentDistance;
                 minInd = j;
@@ -387,8 +387,8 @@ void Uber::handoutOrders() {
         if(minInd == -1) {
             continue;
         }
-        activeOrders[i]->setDriver(static_cast<Driver*>(&*users[minInd]));
-        activeOrders[i]->setStatus(OrderStatus::AWAITING_DRIVER);
+        activeOrders[i].setDriver(static_cast<Driver*>(&*users[minInd]));
+        activeOrders[i].setStatus(OrderStatus::AWAITING_DRIVER);
     }
 }
 
@@ -415,7 +415,7 @@ void Uber::print() {
     checkActiveUserType(UserType::Driver);
     std::cout << "Company Net Earnings: " << netEarnings << std::endl;
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        std::cout << *activeOrders[i] << std::endl;
+        std::cout << activeOrders[i] << std::endl;
     }
 }
 
@@ -575,7 +575,7 @@ void Uber::order() {
     order.setClient((Client*)activeUser);
     order.setStatus(OrderStatus::CREATED);
     std::cout << order;
-    activeOrders.push_back(ObjPointer<Order>(new Order(std::move(order))));
+    activeOrders.push_back(std::move(order));
 }
 
 void Uber::checkOrder(const char* id) const {
@@ -713,10 +713,10 @@ void Uber::checkMessages() {
     std::cout << std::endl <<  "-----------Driver messages from System!-----------" << std::endl;
     bool empty = true;
     for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(activeOrders[i]->getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i]->getDriver() == activeUser) {
+        if(activeOrders[i].getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i].getDriver() == activeUser) {
             std::cout << "Client: "
-                << activeOrders[i]->getClient()->getFirstName() << " " << activeOrders[i]->getClient()->getLastName() << std::endl;
-            std::cout << *activeOrders[i] << std::endl;
+                << activeOrders[i].getClient()->getFirstName() << " " << activeOrders[i].getClient()->getLastName() << std::endl;
+            std::cout << activeOrders[i] << std::endl;
             empty = false;
         }
     }

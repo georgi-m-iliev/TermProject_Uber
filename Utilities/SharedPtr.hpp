@@ -17,8 +17,8 @@ public:
     ObjPointer(const ObjPointer<T>& other);
     ObjPointer(ObjPointer<T>&& other) noexcept;
 
-    ObjPointer& operator=(const ObjPointer<T>& other);
-    ObjPointer& operator=(ObjPointer<T>&& other) noexcept;
+    ObjPointer<T>& operator=(const ObjPointer<T>& other);
+    ObjPointer<T>& operator=(ObjPointer<T>&& other) noexcept;
     T& operator*();
     const T& operator*() const;
     T* operator->();
