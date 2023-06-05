@@ -1,11 +1,14 @@
 #include "Driver.h"
-#include <cstring>
 
 Driver::Driver(const char* username, const char* password, const char* firstName, const char* lastName,
                const char* carNumber, const char* phone):
-        User(username, password, firstName, lastName),
-        carNumber(carNumber), phone(phone), currentLocation{}, rating(0) {}
+        User(username, password, firstName, lastName, 0),
+        carNumber(carNumber), phone(phone), currentLocation{}, rating(0), availability(true) {}
 
+Driver::Driver(const char* username, const char* password, const char* firstName, const char* lastName,
+               const size_t amount, const char* carNumber, const char* phone, const double rating, const bool availability):
+                    User(username, password, firstName, lastName, amount),
+                    carNumber(carNumber), phone(phone), currentLocation{}, rating(rating), availability(availability) {}
 Driver* Driver::clone() const {
     return new Driver(*this);
 }
@@ -24,6 +27,10 @@ const Location& Driver::getCurrentLocation() const {
 
 double Driver::getRating() const {
     return rating;
+}
+
+bool Driver::isAvailable() const {
+    return availability;
 }
 
 void Driver::setCarNumber(const char* str) {
@@ -54,4 +61,8 @@ void Driver::addRating(int rating) {
 
 UserType Driver::getType() const {
     return UserType::Driver;
+}
+
+void Driver::setAvailability(bool status) {
+    availability = status;
 }

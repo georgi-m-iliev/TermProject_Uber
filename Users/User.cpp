@@ -1,9 +1,9 @@
 #include "User.h"
 #include "../Security/SHA256.h"
 
-User::User(const char* username, const char* password, const char* firstName, const char* lastName) :
+User::User(const char* username, const char* password, const char* firstName, const char* lastName, const size_t amount) :
         username(username), passwordHash(SHA256::calculate(password)),
-        firstName(firstName), lastName(lastName), wallet(0) {}
+        firstName(firstName), lastName(lastName), wallet(amount) {}
 
 const MyString& User::getUsername() const {
     return username;

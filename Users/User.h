@@ -15,7 +15,7 @@ class User {
 
 public:
     User() = default;
-    User(const char* username, const char* password, const char* firstName, const char* lastName);
+    User(const char* username, const char* password, const char* firstName, const char* lastName, size_t wallet);
     User(const User& other) = default;
     User(User&& other) = default;
     virtual ~User() = default;

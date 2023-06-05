@@ -57,10 +57,11 @@ void Uber::readUsers(const char* filepath) {
             //this is driver
             [[maybe_unused]] static char* messages[] = {(char*)"username", (char*)"password",
                                        (char*)"firstName", (char*)"lastName", (char*)"amount",
-                                       (char*)"carNumber", (char*)"phoneNumber", (char*)"rating"};
-            char buffer2[sizeof(messages) / sizeof(char*) - 2][BUFFER_SIZE];
+                                       (char*)"carNumber", (char*)"phoneNumber", (char*)"rating", (char*)"availability"};
+            char buffer2[sizeof(messages) / sizeof(char*) - 3][BUFFER_SIZE];
             size_t balance;
             double rating;
+            bool availability;
 
             for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
                 if(ss.eof()) {
@@ -73,7 +74,10 @@ void Uber::readUsers(const char* filepath) {
                         break;
                     case 7:
                         ss >> rating;
+                        ss.ignore(1, ',');
                         break;
+                    case 8:
+                        ss >> availability;
                     default:
                         ss.getline(buffer2[j++], BUFFER_SIZE, ',');
                 }
@@ -219,7 +223,7 @@ void Uber::saveUsers(const char* filepath) {
         throw std::runtime_error("File couldn't be opened!");
     }
 
-    ofs << "type,username,password_hash,first_name,last_name,amount,car_number,phone_number,rating";
+    ofs << "type,username,password_hash,first_name,last_name,amount,car_number,phone_number,rating,availability";
 
     for(size_t i = 0; i < users.getSize(); i++) {
         ofs << '\n';
@@ -235,6 +239,7 @@ void Uber::saveUsers(const char* filepath) {
             ofs << dynamic_cast<Driver*>(&*users[i])->getCarNumber() << ',';
             ofs << dynamic_cast<Driver*>(&*users[i])->getPhoneNumber() << ',';
             ofs << dynamic_cast<Driver*>(&*users[i])->getRating();
+            ofs << dynamic_cast<Driver*>(&*users[i])->isAvailable();
         }
     }
 
@@ -373,7 +378,7 @@ void Uber::handoutOrders() {
         double minDistance = std::numeric_limits<double>::max();
         int minInd = -1;
         for(int j = 0; j < users.getSize(); j++) {
-            if(users[j]->getType() == UserType::Client) {
+            if(users[j]->getType() == UserType::Client || !dynamic_cast<Driver&>(*users[j]).isAvailable()) {
                 continue;
             }
             if(activeOrders[i].hasDeclined(&*users[j])) {
@@ -469,7 +474,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
                 throw std::runtime_error("User with the same username already exists!");
             }
             users.push_back(ObjPtr<User>(
-            new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
+                new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
             ));
         } break;
     }
@@ -614,6 +619,9 @@ void Uber::cancelOrder(const char* id) {
         throw std::runtime_error("You can't cancel your order anymore!");
     }
     order.setStatus(OrderStatus::CANCELED);
+    if(order.getDriver() != nullptr) {
+        order.getDriver()->setAvailability(true);
+    }
     std::cout << "Order has been canceled!" << std::endl;
 }
 
@@ -738,6 +746,7 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
     order.setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
     order.setAmount(amount);
     order.setMinutes(minutes);
+    dynamic_cast<Driver*>(activeUser)->setAvailability(false);
     std::cout << "Order accepted successfully!" << std::endl;
 }
 
@@ -754,7 +763,9 @@ void Uber::declineOrder(const char* id) {
     order.setMinutes(0);
     order.setDriver(nullptr);
     order.addDriverDeclined(activeUser);
+    dynamic_cast<Driver*>(activeUser)->setAvailability(true);
     std::cout << "Order declined successfully!" << std::endl;
+    handoutOrders();
 }
 
 void Uber::pickupPassenger(const char* id) {
@@ -780,6 +791,7 @@ void Uber::finishOrder(const char* id) {
     }
     order.setStatus(OrderStatus::DESTINATION_REACHED);
     dynamic_cast<Driver*>(activeUser)->setCurrentLocation(order.getDestination());
+    dynamic_cast<Driver*>(activeUser)->setAvailability(true);
     std::cout << "Order finished successfully!" << std::endl;
 }
 
