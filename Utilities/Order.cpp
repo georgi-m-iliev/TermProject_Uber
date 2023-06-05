@@ -1,18 +1,17 @@
-#include <cstring>
 #include "Order.h"
+#include <cstring>
 #include <chrono>
 
 namespace {
-    int absInt(const int num) {
-        return num < 0 ? -num : num;
-    }
-
-    void numToStr(size_t num, char* str) {
+    void numToStr(size_t num, char* str, int length) {
         int len = 0;
         size_t copy = num;
         do {
             copy /= 10;
             len++;
+            if(len > length) {
+                return;
+            }
         } while(copy != 0);
         for(int i = len - 1; i >= 0; i--) {
             str[i] = (char)(num % 10 + '0');
@@ -23,12 +22,13 @@ namespace {
 }
 
 void Order::calcID() {
-    static size_t EPOCH_START = 1684108800;
-    char str[100];
-    size_t seconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
+    static time_t EPOCH_START = 1684108800; // moment of partial creation of this app
+    static char str[14]; // 99 symbols id would  be enough to make it through at least a thousand years,
+                         // epoch will be long dead as so will be this ap
+    time_t seconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
     seconds -= EPOCH_START;
-    numToStr(seconds, str);
-// 212413
+    numToStr(seconds, str, 14);
+    // some character translation to make it more readable and unique
     for(int i = 0; i < strlen(str); i++) {
         if(i % 2 == 0) {
             str[i] += 'A' - '0';
@@ -36,7 +36,7 @@ void Order::calcID() {
         else if(i % 3 == 0) {
             str[i] += 'f' - '0';
             str[i] -= 2;
-            str[i] += absInt(address.getPoint().x - address.getPoint().y) % 10;
+            str[i] += std::abs(address.getPoint().x - address.getPoint().y) % 10;
         }
         else {
             str[i] += 'a' - '0';
