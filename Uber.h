@@ -1,6 +1,6 @@
 #pragma once
 #include "Utilities/vector.hpp"
-#include "Utilities/SharedPtr.hpp"
+#include "Utilities/ObjPtr.hpp"
 #include "Users/Client.h"
 #include "Users/Driver.h"
 #include "Utilities/Order.h"
@@ -11,7 +11,7 @@ const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
 class Uber {
     MyString path;
 
-    vector<ObjPointer<User>> users;
+    vector<ObjPtr<User>> users;
     vector<Order> activeOrders;
     vector<Order> finishedOrders;
 

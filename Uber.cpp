@@ -51,7 +51,7 @@ void Uber::readUsers(const char* filepath) {
             client.setFirstName(buffer2[2]);
             client.setLastName(buffer2[3]);
             client.setBalanceNom(amount);
-            users.push_back(ObjPointer<User>(new Client(std::move(client))));
+            users.push_back(ObjPtr<User>(new Client(std::move(client))));
         }
         else if(strcmp(buffer, "1") == 0) {
             //this is driver
@@ -92,7 +92,7 @@ void Uber::readUsers(const char* filepath) {
             driver.setPhoneNumber(buffer2[5]);
             driver.setRating(rating);
 
-            users.push_back(ObjPointer<User>(new Driver(std::move(driver))));
+            users.push_back(ObjPtr<User>(new Driver(std::move(driver))));
         }
     }
 
@@ -444,7 +444,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
                 throw std::runtime_error("User with the same username already exists!");
             }
 
-            users.push_back(ObjPointer<User>(
+            users.push_back(ObjPtr<User>(
                     new Client(buffer[0], buffer[1], buffer[2], buffer[3])
             ));
         } break;
@@ -467,7 +467,7 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
-            users.push_back(ObjPointer<User>(
+            users.push_back(ObjPtr<User>(
             new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
             ));
         } break;
