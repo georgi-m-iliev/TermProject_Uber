@@ -3,6 +3,7 @@
 #include "MyString.h"
 #include "../Users/Client.h"
 #include "../Users/Driver.h"
+#include "vector.hpp"
 
 enum class OrderStatus {
     EMPTY,
@@ -29,6 +30,9 @@ class Order {
     size_t amount;
 
     void calcID();
+
+    vector<const User*> driversDeclined; // this would be a shallow copy, as I would need it only during runtime
+                                        // since we aren't allowing users to delete account, there won't be a problem
 public:
     Order();
     Order(const char* addressName, int addressX, int addressY,
@@ -67,6 +71,11 @@ public:
     void setAmountNom(size_t amount);
 
     void rateDriver(short rating);
+
+    void addDriverDeclined(const User* user);
+    bool hasDeclined(const User* user) const;
+    void clearDriversDeclined();
+
 //    friend class Uber;
     friend std::ostream& operator<<(std::ostream& os, const Order& order);
 };

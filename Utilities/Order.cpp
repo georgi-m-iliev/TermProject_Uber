@@ -218,3 +218,20 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
 //    std::cout << "Status: " << (size_t)order.getStatus() << std::endl;
     return os;
 }
+
+void Order::addDriverDeclined(const User* user) {
+    driversDeclined.push_back(user);
+}
+
+bool Order::hasDeclined(const User* user) const {
+    for(size_t i = 0; i < driversDeclined.getSize(); i++) {
+        if(driversDeclined[i]->getUsername() == user->getUsername()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Order::clearDriversDeclined() {
+    driversDeclined.clear();
+}

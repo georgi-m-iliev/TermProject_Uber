@@ -55,20 +55,3 @@ void Driver::addRating(int rating) {
 UserType Driver::getType() const {
     return UserType::Driver;
 }
-
-void Driver::addDeclinedOrder(const char* id) {
-    declinedOrders.push_back(id);
-}
-
-void Driver::addDeclinedOrder(const MyString& id) {
-    declinedOrders.push_back(id);
-}
-
-bool Driver::isDeclined(const char* id) const {
-    for(int i = 0; i < declinedOrders.getSize(); i++) {
-        if(strcmp(declinedOrders[i].c_str(), id) == 0) {
-            return true;
-        }
-    }
-    return false;
-}

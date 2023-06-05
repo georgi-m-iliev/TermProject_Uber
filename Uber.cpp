@@ -360,6 +360,7 @@ void Uber::moveOrderToFinished(const char* id) {
             throw std::runtime_error("Order with this ID was not found!");
         }
     }
+    activeOrders[ind].clearDriversDeclined();
     finishedOrders.push_back(std::move(activeOrders[ind]));
     activeOrders.pop_at(ind);
 }
@@ -375,7 +376,7 @@ void Uber::handoutOrders() {
             if(users[j]->getType() == UserType::Client) {
                 continue;
             }
-            if(dynamic_cast<Driver*>(&*users[j])->isDeclined(activeOrders[i].getID())) {
+            if(activeOrders[i].hasDeclined(&*users[j])) {
                 continue;
             }
             double currentDistance = distanceBtwn(activeOrders[i].getAddress(), static_cast<Driver*>(&*users[j])->getCurrentLocation());
@@ -752,7 +753,7 @@ void Uber::declineOrder(const char* id) {
     order.setAmount(0);
     order.setMinutes(0);
     order.setDriver(nullptr);
-    dynamic_cast<Driver*>(activeUser)->addDeclinedOrder(order.getID(true));
+    order.addDriverDeclined(activeUser);
     std::cout << "Order declined successfully!" << std::endl;
 }
 

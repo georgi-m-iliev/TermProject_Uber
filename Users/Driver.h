@@ -2,14 +2,12 @@
 #include "User.h"
 #include "../Utilities/PhoneNumber.h"
 #include "../Utilities/Location.h"
-#include "../Utilities/vector.hpp"
 
 class Driver: public User {
     MyString carNumber;
     PhoneNumber phone;
     Location currentLocation;
     double rating = 0;
-    vector<MyString> declinedOrders;
 public:
     Driver() = default;
     Driver(const char* username, const char* password, const char* firstName, const char* lastName,
@@ -31,10 +29,6 @@ public:
     void setCurrentLocation(const Location& loc);
     void addRating(int rating);
     void setRating(double rating);
-
-    void addDeclinedOrder(const char* id);
-    void addDeclinedOrder(const MyString& id);
-    bool isDeclined(const char* id) const;
 
     UserType getType() const override;
 };
