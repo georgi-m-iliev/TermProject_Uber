@@ -3,7 +3,7 @@
 
 User::User(const char* username, const char* password, const char* firstName, const char* lastName) :
         username(username), passwordHash(SHA256::calculate(password)),
-        firstName(firstName), lastName(lastName) {}
+        firstName(firstName), lastName(lastName), wallet(0) {}
 
 const MyString& User::getUsername() const {
     return username;
@@ -48,30 +48,28 @@ void User::setLastName(const char* name) {
     lastName = name;
 }
 
-
-size_t User::getBalance() const {
-    return wallet;
-}
-
-double User::getBalanceInLeva() const {
+double User::getBalance() const {
     return (double)wallet / 100.0;
 }
 
-
-void User::setBalance(size_t amount) {
-    wallet = amount;
+size_t User::getBalanceNom() const {
+    return wallet;
 }
 
-void User::setBalanceInLeva(double amount) {
+void User::setBalance(double amount) {
     wallet = (size_t)(amount / 100.0);
 }
 
-void User::depositAmount(double leva) {
-    wallet += (size_t)(leva * 100);
+void User::setBalanceNom(size_t amount) {
+    wallet = amount;
 }
 
-void User::withdrawAmount(double leva) {
-    wallet -= (size_t)(leva * 100);
+void User::depositAmount(double amount) {
+    wallet += (size_t)(amount * 100);
+}
+
+void User::withdrawAmount(double amount) {
+    wallet -= (size_t)(amount * 100);
 }
 
 std::ostream& operator<<(std::ostream& os, const User& user) {

@@ -50,7 +50,7 @@ void Uber::readUsers(const char* filepath) {
             client.setPasswordHash(buffer2[1]);
             client.setFirstName(buffer2[2]);
             client.setLastName(buffer2[3]);
-            client.setBalance(amount);
+            client.setBalanceNom(amount);
             users.push_back(ObjPointer<User>(new Client(std::move(client))));
         }
         else if(strcmp(buffer, "1") == 0) {
@@ -228,7 +228,7 @@ void Uber::saveUsers(const char* filepath) {
         ofs << users[i]->getPasswordHash() << ',';
         ofs << users[i]->getFirstName() << ',';
         ofs << users[i]->getLastName() << ',';
-        ofs << users[i]->getBalance();
+        ofs << users[i]->getBalanceNom();
 
         if(users[i]->getType() == UserType::Driver) {
             ofs << ',';
@@ -631,13 +631,13 @@ void Uber::payOrder(const char* id, double levas) {
     if(order.getStatus() != OrderStatus::DESTINATION_REACHED) {
         throw std::runtime_error("You can't pay at this moment!");
     }
-    if(order.getAmount() != (size_t)(levas * 100)) {
+    if(order.getAmountNom() != (size_t)(levas * 100)) {
         throw std::invalid_argument("The order amount is not the same as the pay amount!");
     }
     order.setStatus(OrderStatus::PAID);
     order.getClient()->withdrawAmount(levas);
     order.getDriver()->depositAmount(levas);
-    netEarnings += order.getAmountInLeva();
+    netEarnings += order.getAmount();
 
     std::cout << "Order paid successfully!" << std::endl;
 }
@@ -735,7 +735,7 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     order.setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
-    order.setAmount((size_t)(amount * 100));
+    order.setAmount(amount);
     order.setMinutes(minutes);
     std::cout << "Order accepted successfully!" << std::endl;
 }
@@ -790,7 +790,7 @@ void Uber::acceptPayment(const char* id, double amount) {
     if(order.getStatus() != OrderStatus::PAID || order.getDriver() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
-    if(order.getAmount() != (size_t)(amount * 100)) {
+    if(order.getAmountNom() != (size_t)(amount * 100)) {
         throw std::invalid_argument("Invalid amount specified!");
     }
     order.setStatus(OrderStatus::AWAITING_RATING);

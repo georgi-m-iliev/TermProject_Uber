@@ -136,8 +136,12 @@ short Order::getMinutes() const {
     return minutes;
 }
 
-size_t Order::getAmount() const {
-    return amount;
+double Order::getAmount() const {
+    return (double)amount / 100.0;
+}
+
+size_t Order::getAmountNom() const {
+    return (size_t)(amount / 100);
 }
 
 void Order::setStatus(OrderStatus status) {
@@ -177,7 +181,11 @@ void Order::setMinutes(short minutes) {
     this->minutes = minutes;
 }
 
-void Order::setAmount(size_t amount) {
+void Order::setAmount(double amount) {
+    this->amount = (size_t)(amount * 100);
+}
+
+void Order::setAmountNom(size_t amount) {
     this->amount = amount;
 }
 
@@ -197,7 +205,7 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
         std::cout << "NaN";
     }
     else {
-        std::cout << order.getAmountInLeva() << " ";
+        std::cout << order.getAmount() << " ";
     }
     std::cout << " Waiting time: ";
     if(order.getMinutes() == -1) {
@@ -209,8 +217,4 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
     std::cout << " minutes" << std::endl;
 //    std::cout << "Status: " << (size_t)order.getStatus() << std::endl;
     return os;
-}
-
-double Order::getAmountInLeva() const {
-    return (double)amount / 100.0;
 }

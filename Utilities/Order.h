@@ -53,9 +53,9 @@ public:
     const Location& getDestination() const;
     short getPassengers() const;
     short getMinutes() const;
-    size_t getAmount() const;
+    double getAmount() const;
+    size_t getAmountNom() const;
 
-    double getAmountInLeva() const;
     void setStatus(OrderStatus status);
     void setClient(Client* client);
     void setDriver(Driver* driver);
@@ -63,7 +63,8 @@ public:
     void setDestination(const char* name, int x, int y, const char* note = nullptr);
     void setPassengers(short passengers);
     void setMinutes(short minutes);
-    void setAmount(size_t amount);
+    void setAmount(double amount);
+    void setAmountNom(size_t amount);
 
     void rateDriver(short rating);
 //    friend class Uber;
