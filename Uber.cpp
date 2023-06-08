@@ -121,8 +121,8 @@ void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
         Location l1, l2; //4, 5
         short status, passengers, minutes; // 1,6,7
         size_t amount; //7
-        Client* client;
-        Driver* driver;
+        Client* client = nullptr;
+        Driver* driver = nullptr;
         for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
             if(ss.eof()) {
                 throw std::runtime_error("Row consists of incomplete data!");
@@ -164,10 +164,10 @@ void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
         }
         for(int k = 0; k < users.getSize(); k++) {
             if(strcmp(users[k]->getUsername().c_str(), buffer2[1]) == 0) {
-                client = dynamic_cast<Client*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is deleted
+                client = dynamic_cast<Client*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is of wrong kind
             }
             else if(strcmp(buffer2[2], "NULL") != 0 && strcmp(users[k]->getUsername().c_str(), buffer2[2]) == 0) {
-                driver = dynamic_cast<Driver*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is deleted
+                driver = dynamic_cast<Driver*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is of wrong kind
             }
         }
         if(addNet) {
@@ -236,10 +236,10 @@ void Uber::saveUsers(const char* filepath) {
 
         if(users[i]->getType() == UserType::Driver) {
             ofs << ',';
-            ofs << dynamic_cast<Driver*>(&*users[i])->getCarNumber() << ',';
-            ofs << dynamic_cast<Driver*>(&*users[i])->getPhoneNumber() << ',';
-            ofs << dynamic_cast<Driver*>(&*users[i])->getRating();
-            ofs << dynamic_cast<Driver*>(&*users[i])->isAvailable();
+            ofs << static_cast<Driver*>(&*users[i])->getCarNumber() << ',';
+            ofs << static_cast<Driver*>(&*users[i])->getPhoneNumber() << ',';
+            ofs << static_cast<Driver*>(&*users[i])->getRating();
+            ofs << static_cast<Driver*>(&*users[i])->isAvailable();
         }
     }
 
@@ -410,7 +410,6 @@ Uber::Uber(const char* path): activeUser(nullptr), path(path) {
 Uber::Uber(const Uber& other): path(other.path), users(other.users), activeOrders(other.activeOrders), finishedOrders(other.finishedOrders) {
     activeUser = nullptr;
 }
-
 
 Uber::~Uber() {
     save();
@@ -672,14 +671,14 @@ void Uber::rateOrder(const char* id, short rating) {
     std::cout << "Order rated successfully!" << std::endl;
 }
 
-void Uber::addMoney(double levas) {
-    if(levas <= 0) {
+void Uber::addMoney(double amount) {
+    if(amount <= 0) {
         throw std::invalid_argument("Invalid value specified!");
     }
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
-    ((Client*) activeUser)->depositAmount(levas);
-    std::cout << "The deposit of " << levas << " was successful!" << std::endl;
+    ((Client*) activeUser)->depositAmount(amount);
+    std::cout << "The deposit of " << amount << " was successful!" << std::endl;
 }
 
 void Uber::changeAddress(std::stringstream& ss) {
@@ -711,7 +710,7 @@ void Uber::changeAddress(std::stringstream& ss) {
         throw std::runtime_error("Command syntax invalid!");
     }
 
-    dynamic_cast<Driver*>(activeUser)->setCurrentLocation(name, x, y);
+    static_cast<Driver*>(activeUser)->setCurrentLocation(name, x, y);
     std::cout << "Location changes successfully!" << std::endl;
 }
 
@@ -746,7 +745,7 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
     order.setStatus(OrderStatus::ACCEPTED_BY_DRIVER);
     order.setAmount(amount);
     order.setMinutes(minutes);
-    dynamic_cast<Driver*>(activeUser)->setAvailability(false);
+    static_cast<Driver*>(activeUser)->setAvailability(false);
     std::cout << "Order accepted successfully!" << std::endl;
 }
 
@@ -763,7 +762,7 @@ void Uber::declineOrder(const char* id) {
     order.setMinutes(0);
     order.setDriver(nullptr);
     order.addDriverDeclined(activeUser);
-    dynamic_cast<Driver*>(activeUser)->setAvailability(true);
+    static_cast<Driver*>(activeUser)->setAvailability(true);
     std::cout << "Order declined successfully!" << std::endl;
     handoutOrders();
 }
@@ -777,7 +776,7 @@ void Uber::pickupPassenger(const char* id) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     order.setStatus(OrderStatus::PASSENGER_PICKEDUP);
-    dynamic_cast<Driver*>(activeUser)->setCurrentLocation(order.getAddress());
+    static_cast<Driver*>(activeUser)->setCurrentLocation(order.getAddress());
     std::cout << "Passenger picked up recorded!" << std::endl;
 }
 
@@ -790,8 +789,8 @@ void Uber::finishOrder(const char* id) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     order.setStatus(OrderStatus::DESTINATION_REACHED);
-    dynamic_cast<Driver*>(activeUser)->setCurrentLocation(order.getDestination());
-    dynamic_cast<Driver*>(activeUser)->setAvailability(true);
+    static_cast<Driver*>(activeUser)->setCurrentLocation(order.getDestination());
+    static_cast<Driver*>(activeUser)->setAvailability(true);
     std::cout << "Order finished successfully!" << std::endl;
 }
 

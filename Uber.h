@@ -7,7 +7,6 @@
 
 const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
 
-
 class Uber {
     MyString path;
 
@@ -52,7 +51,7 @@ public:
     void cancelOrder(const char* id);
     void payOrder(const char* id, double levas);
     void rateOrder(const char* id, short rating);
-    void addMoney(double levas);
+    void addMoney(double amount);
 
     void changeAddress(std::stringstream& ss);
     void checkMessages();
