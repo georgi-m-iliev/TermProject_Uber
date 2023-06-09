@@ -632,7 +632,7 @@ void Uber::cancelOrder(const char* id) {
     checkActiveUserType(UserType::Client);
 
     Order& order = findOrder(id);
-    if(order.getClient() != activeUser && order.getDriver() != activeUser) {
+    if(order.getClient() != activeUser) {
         throw std::runtime_error("You have no access to this order or action unavailable!");
     }
     if(order.getStatus() > OrderStatus::ACCEPTED_BY_DRIVER) {
@@ -642,6 +642,7 @@ void Uber::cancelOrder(const char* id) {
     if(order.getDriver() != nullptr) {
         order.getDriver()->setAvailability(true);
     }
+    moveOrderToFinished(order.getID());
     std::cout << "Order has been canceled!" << std::endl;
 }
 
