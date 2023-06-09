@@ -44,8 +44,9 @@ public:
     void loginUser(std::stringstream& ss);
     void logoutUser();
     void changePassword(const char* password);
-
     void whoami() const;
+    void listOrders() const;
+
     void order();
     void checkOrder(const char* id) const;
     void cancelOrder(const char* id);

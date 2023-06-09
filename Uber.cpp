@@ -407,7 +407,7 @@ Uber::Uber(const char* path): activeUser(nullptr), path(path) {
     load();
 }
 
-Uber::Uber(const Uber& other): path(other.path), users(other.users), activeOrders(other.activeOrders), finishedOrders(other.finishedOrders) {
+Uber::Uber(const Uber& other): path(other.path), users(other.users), activeOrders(other.activeOrders), finishedOrders(other.finishedOrders)     {
     activeUser = nullptr;
 }
 
@@ -527,6 +527,27 @@ void Uber::whoami() const {
     checkUserLoggedIn();
     std::cout << "User: " << activeUser->getUsername() << " -> "
                 << (activeUser->getType() == UserType::Client ? "Client" : "Driver") << std::endl;
+}
+
+void Uber::listOrders() const {
+    checkUserLoggedIn();
+    std::cout << std::endl <<  "-------Orders associated with current user!-------" << std::endl;
+    switch(activeUser->getType()) {
+        case UserType::Client:
+            for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
+                if(activeOrders[i].getClient() == activeUser) {
+                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                }
+            }
+            break;
+        case UserType::Driver:
+            for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
+                if(activeOrders[i].getDriver() == activeUser && activeOrders[i].getStatus() > OrderStatus::ACCEPTED_BY_DRIVER && activeOrders[i].getStatus() < OrderStatus::AWAITING_RATING) {
+                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                }
+            }
+            break;
+    }
 }
 
 void Uber::order() {

@@ -20,6 +20,7 @@ login <username> <password>
 logout
 change_password <new password>
 whoami
+list_orders
 
 --------Order----------
 order

@@ -75,6 +75,14 @@ int main() {
                 std::cout << ex.what() << std::endl;
             }
         }
+        else if(strcmp(buffer, "list_orders") == 0) {
+            try {
+                service.listOrders();
+            }
+            catch(const std::exception& ex) {
+                std::cout << ex.what() << std::endl;
+            }
+        }
         else if(strcmp(buffer, "order") == 0) {
             try {
                 service.order();
