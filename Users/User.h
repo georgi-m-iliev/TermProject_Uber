@@ -1,9 +1,16 @@
 #pragma once
 #include "../Utilities/MyString.h"
+#include "../Utilities/vector.hpp"
 
 enum class UserType {
     Client = 0,
     Driver = 1
+};
+
+enum class WarningType {
+    NEW_ORDER,
+    ORDER_CANCELD,
+    ORDER_ACCEPTED
 };
 
 class User {
@@ -12,6 +19,7 @@ class User {
     MyString firstName;
     MyString lastName;
     size_t wallet;
+    vector<MyString> systemWarnings;
 
 public:
     User() = default;
@@ -28,6 +36,7 @@ public:
     const MyString& getPasswordHash() const;
     double getBalance() const;
     size_t getBalanceNom() const;
+    void displaySystemWarnings(std::ostream& os);
 
     bool verifyPassword(const char* password) const;
     void setUsername(const char* username);
@@ -37,6 +46,9 @@ public:
     void setLastName(const char* name);
     void setBalance(double amount);
     void setBalanceNom(size_t amount);
+    void addSystemWarning(MyString message);
+    void addSystemWarning(WarningType warning, MyString id);
+
 
     void depositAmount(double amount);
     void withdrawAmount(double amount);

@@ -641,6 +641,7 @@ void Uber::cancelOrder(const char* id) {
     order.setStatus(OrderStatus::CANCELED);
     if(order.getDriver() != nullptr) {
         order.getDriver()->setAvailability(true);
+        order.getDriver()->addSystemWarning(WarningType::ORDER_CANCELD, order.getID());
     }
     moveOrderToFinished(order.getID());
     std::cout << "Order has been canceled!" << std::endl;
@@ -738,21 +739,31 @@ void Uber::changeAddress(std::stringstream& ss) {
 
 void Uber::checkMessages() {
     checkUserLoggedIn();
-    checkActiveUserType(UserType::Driver);
-    handoutOrders();
-    std::cout << std::endl <<  "-----------Driver messages from System!-----------" << std::endl;
-    bool empty = true;
-    for(size_t i = 0; i < activeOrders.getSize(); i++) {
-        if(activeOrders[i].getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i].getDriver() == activeUser) {
-            std::cout << "Client: "
-                << activeOrders[i].getClient()->getFirstName() << " " << activeOrders[i].getClient()->getLastName() << std::endl;
-            std::cout << activeOrders[i] << std::endl;
-            empty = false;
-        }
+    switch(activeUser->getType()) {
+        case UserType::Client: {
+            std::cout << std::endl <<  "-----------Client messages from System!-----------" << std::endl;
+            activeUser->displaySystemWarnings(std::cout);
+        } break;
+        case UserType::Driver: {
+            handoutOrders();
+            std::cout << std::endl <<  "-----------Driver messages from System!-----------" << std::endl;
+            activeUser->displaySystemWarnings(std::cout);
+            std::cout << std::endl <<  "--------------------New orders:-------------------" << std::endl;
+            bool empty = true;
+            for(size_t i = 0; i < activeOrders.getSize(); i++) {
+                if(activeOrders[i].getStatus() == OrderStatus::AWAITING_DRIVER && activeOrders[i].getDriver() == activeUser) {
+                    std::cout << "Client: "
+                              << activeOrders[i].getClient()->getFirstName() << " " << activeOrders[i].getClient()->getLastName() << std::endl;
+                    std::cout << activeOrders[i] << std::endl;
+                    empty = false;
+                }
+            }
+            if(empty) {
+                std::cout << "                 No new orders!                 " << std::endl;
+            }
+        } break;
     }
-    if(empty) {
-        std::cout << "                 No new messages!                 " << std::endl;
-    }
+
 }
 
 void Uber::acceptOrder(const char* id, short minutes, double amount) {
@@ -768,6 +779,7 @@ void Uber::acceptOrder(const char* id, short minutes, double amount) {
     order.setAmount(amount);
     order.setMinutes(minutes);
     static_cast<Driver*>(activeUser)->setAvailability(false);
+    order.getClient()->addSystemWarning(WarningType::ORDER_ACCEPTED, order.getID());
     std::cout << "Order accepted successfully!" << std::endl;
 }
 

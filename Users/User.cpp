@@ -56,12 +56,47 @@ size_t User::getBalanceNom() const {
     return wallet;
 }
 
+void User::displaySystemWarnings(std::ostream& os) {
+    for(size_t i = 0; i < systemWarnings.getSize(); i++) {
+        os << systemWarnings[i] << std::endl;
+    }
+    systemWarnings.clear();
+}
+
+
 void User::setBalance(double amount) {
     wallet = (size_t)(amount / 100.0);
 }
 
 void User::setBalanceNom(size_t amount) {
     wallet = amount;
+}
+
+void User::addSystemWarning(MyString message) {
+    systemWarnings.push_back(std::move(message));
+}
+
+void User::addSystemWarning(const WarningType warning, MyString id) {
+    switch(warning) {
+        case WarningType::NEW_ORDER:
+            if(getType() != UserType::Driver) {
+                throw std::logic_error("Can't add this type of message to Driver!");
+            }
+            systemWarnings.push_back("New order for you with id: " + id);
+        break;
+        case WarningType::ORDER_ACCEPTED:
+            if(getType() != UserType::Client) {
+                throw std::logic_error("Can't add this type of message to Client!");
+            }
+            systemWarnings.push_back("Your order with id: " + id + " has been accepted!");
+        break;
+        case WarningType::ORDER_CANCELD:
+            if(getType() != UserType::Driver) {
+                throw std::logic_error("Can't add this type of message to Driver!");
+            }
+            systemWarnings.push_back("Your order with id: " + id + " has been canceled!");
+        break;
+    }
 }
 
 void User::depositAmount(double amount) {
