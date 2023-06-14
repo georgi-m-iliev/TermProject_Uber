@@ -90,7 +90,7 @@ void User::addSystemWarning(const WarningType warning, MyString id) {
             }
             systemWarnings.push_back("Your order with id: " + id + " has been accepted!");
         break;
-        case WarningType::ORDER_CANCELD:
+        case WarningType::ORDER_CANCELED:
             if(getType() != UserType::Driver) {
                 throw std::logic_error("Can't add this type of message to Driver!");
             }

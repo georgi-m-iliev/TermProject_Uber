@@ -13,4 +13,7 @@ public:
     virtual Client* clone() const override;
 
     UserType getType() const override;
+
+    std::istream& read(std::istream& inp) override;
+    std::ostream& write(std::ostream& out) const override;
 };

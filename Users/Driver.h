@@ -37,4 +37,7 @@ public:
     void setAvailability(bool status);
 
     UserType getType() const override;
+
+    std::istream& read(std::istream& inp) override;
+    std::ostream& write(std::ostream& out) const override;
 };

@@ -66,3 +66,57 @@ UserType Driver::getType() const {
 void Driver::setAvailability(bool status) {
     availability = status;
 }
+
+std::istream& Driver::read(std::istream& inp) {
+    [[maybe_unused]] static char* messages[] = {(char*)"username", (char*)"password",
+                                                (char*)"firstName", (char*)"lastName", (char*)"amount",
+                                                (char*)"carNumber", (char*)"phoneNumber", (char*)"rating", (char*)"availability"};
+    char buffer2[sizeof(messages) / sizeof(char*) - 3][BUFFER_SIZE];
+    size_t balance;
+    for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
+        if(inp.eof()) {
+            throw std::runtime_error("Row consists of incomplete data!");
+        }
+        switch(i) {
+            case 4:
+                inp >> balance;
+                inp.ignore(1, ',');
+                break;
+            case 7:
+                inp >> rating;
+                inp.ignore(1, ',');
+                break;
+            case 8:
+                inp >> availability;
+                break;
+            default:
+                inp.getline(buffer2[j++], BUFFER_SIZE, ',');
+        }
+    }
+    if(!inp.eof()) {
+        throw std::runtime_error("Row consists of too much data!");
+    }
+    setUsername(buffer2[0]);
+    setPasswordHash(buffer2[1]);
+    setFirstName(buffer2[2]);
+    setLastName(buffer2[3]);
+    setBalanceNom(balance);
+    setCarNumber(buffer2[4]);
+    setPhoneNumber(buffer2[5]);
+    setRating(rating);
+    return inp;
+}
+
+std::ostream& Driver::write(std::ostream& out) const {
+    out << (int)getType() << ',';
+    out << getUsername() << ',';
+    out << getPasswordHash() << ',';
+    out << getFirstName() << ',';
+    out << getLastName() << ',';
+    out << getBalanceNom() << ',';
+    out << getCarNumber() << ',';
+    out << getPhoneNumber() << ',';
+    out << getRating() << ',';
+    out << isAvailable();
+    return out;
+}

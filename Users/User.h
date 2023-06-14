@@ -2,6 +2,7 @@
 #include "../Utilities/MyString.h"
 #include "../Utilities/vector.hpp"
 
+
 enum class UserType {
     Client = 0,
     Driver = 1
@@ -9,7 +10,7 @@ enum class UserType {
 
 enum class WarningType {
     NEW_ORDER,
-    ORDER_CANCELD,
+    ORDER_CANCELED,
     ORDER_ACCEPTED
 };
 
@@ -22,6 +23,8 @@ class User {
     vector<MyString> systemWarnings;
 
 public:
+    const int BUFFER_SIZE = 512;
+
     User() = default;
     User(const char* username, const char* password, const char* firstName, const char* lastName, size_t wallet);
     User(const User& other) = default;
@@ -54,6 +57,10 @@ public:
     void withdrawAmount(double amount);
 
     virtual UserType getType() const = 0;
+
+
+    virtual std::istream& read(std::istream& inp) = 0;
+    virtual std::ostream& write(std::ostream& out) const = 0;
 
     friend std::ostream& operator<<(std::ostream& os, const User& user);
 };
