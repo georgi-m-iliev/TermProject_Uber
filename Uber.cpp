@@ -22,80 +22,13 @@ void Uber::readUsers(const char* filepath) {
         ss.getline(buffer, BUFFER_SIZE, ',');
 
         if(strcmp(buffer, "0") == 0) {
-            //this is client
-            [[maybe_unused]] static char* messages[] = {
-                (char*)"username", (char*)"password",(char*)"firstName", (char*)"lastName", (char*)"amount"
-            };
-            char buffer2[sizeof(messages) / sizeof(char*) - 1][BUFFER_SIZE];
-            size_t amount;
-
-            for(int i = 0; i < sizeof(messages) / sizeof(char*); i++) {
-                if(ss.eof()) {
-                    throw std::runtime_error("Row consists of incomplete data!");
-                }
-                switch(i) {
-                    case 4:
-                        ss >> amount;
-                        break;
-                    default:
-                        ss.getline(buffer2[i], BUFFER_SIZE, ',');
-                }
-            }
-            if(!ss.eof()) {
-                throw std::runtime_error("Row consists of too much data!");
-            }
-
             Client client;
-            client.setUsername(buffer2[0]);
-            client.setPasswordHash(buffer2[1]);
-            client.setFirstName(buffer2[2]);
-            client.setLastName(buffer2[3]);
-            client.setBalanceNom(amount);
+            client.read(ss);
             users.push_back(ObjPtr<User>(new Client(std::move(client))));
         }
         else if(strcmp(buffer, "1") == 0) {
-            //this is driver
-            [[maybe_unused]] static char* messages[] = {(char*)"username", (char*)"password",
-                                       (char*)"firstName", (char*)"lastName", (char*)"amount",
-                                       (char*)"carNumber", (char*)"phoneNumber", (char*)"rating", (char*)"availability"};
-            char buffer2[sizeof(messages) / sizeof(char*) - 3][BUFFER_SIZE];
-            size_t balance;
-            double rating;
-            bool availability;
-
-            for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
-                if(ss.eof()) {
-                    throw std::runtime_error("Row consists of incomplete data!");
-                }
-                switch(i) {
-                    case 4:
-                        ss >> balance;
-                        ss.ignore(1, ',');
-                        break;
-                    case 7:
-                        ss >> rating;
-                        ss.ignore(1, ',');
-                        break;
-                    case 8:
-                        ss >> availability;
-                    default:
-                        ss.getline(buffer2[j++], BUFFER_SIZE, ',');
-                }
-            }
-            if(!ss.eof()) {
-                throw std::runtime_error("Row consists of too much data!");
-            }
-
             Driver driver;
-            driver.setUsername(buffer2[0]);
-            driver.setPasswordHash(buffer2[1]);
-            driver.setFirstName(buffer2[2]);
-            driver.setLastName(buffer2[3]);
-            driver.setBalance(balance);
-            driver.setCarNumber(buffer2[4]);
-            driver.setPhoneNumber(buffer2[5]);
-            driver.setRating(rating);
-
+            driver.read(ss);
             users.push_back(ObjPtr<User>(new Driver(std::move(driver))));
         }
     }
@@ -227,20 +160,7 @@ void Uber::saveUsers(const char* filepath) {
 
     for(size_t i = 0; i < users.getSize(); i++) {
         ofs << '\n';
-        ofs << (int)users[i]->getType() << ',';
-        ofs << users[i]->getUsername() << ',';
-        ofs << users[i]->getPasswordHash() << ',';
-        ofs << users[i]->getFirstName() << ',';
-        ofs << users[i]->getLastName() << ',';
-        ofs << users[i]->getBalanceNom();
-
-        if(users[i]->getType() == UserType::Driver) {
-            ofs << ',';
-            ofs << static_cast<Driver*>(&*users[i])->getCarNumber() << ',';
-            ofs << static_cast<Driver*>(&*users[i])->getPhoneNumber() << ',';
-            ofs << static_cast<Driver*>(&*users[i])->getRating();
-            ofs << static_cast<Driver*>(&*users[i])->isAvailable();
-        }
+        users[i]->write(ofs);
     }
 
     ofs.close();

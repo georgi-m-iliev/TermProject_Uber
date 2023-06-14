@@ -88,6 +88,7 @@ std::istream& Driver::read(std::istream& inp) {
                 break;
             case 8:
                 inp >> availability;
+                break;
             default:
                 inp.getline(buffer2[j++], BUFFER_SIZE, ',');
         }
@@ -99,7 +100,7 @@ std::istream& Driver::read(std::istream& inp) {
     setPasswordHash(buffer2[1]);
     setFirstName(buffer2[2]);
     setLastName(buffer2[3]);
-    setBalance(balance);
+    setBalanceNom(balance);
     setCarNumber(buffer2[4]);
     setPhoneNumber(buffer2[5]);
     setRating(rating);
@@ -112,11 +113,10 @@ std::ostream& Driver::write(std::ostream& out) const {
     out << getPasswordHash() << ',';
     out << getFirstName() << ',';
     out << getLastName() << ',';
-    out << getBalanceNom();
-    out << ',';
+    out << getBalanceNom() << ',';
     out << getCarNumber() << ',';
     out << getPhoneNumber() << ',';
-    out << getRating();
+    out << getRating() << ',';
     out << isAvailable();
     return out;
 }
