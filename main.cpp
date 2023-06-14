@@ -3,7 +3,7 @@
 #include <sstream>
 #include "Uber.h"
 
-const int BUFFER_SIZE = 1024;
+static int BUFFER_SIZE = 1024;
 
 int main() {
     Uber service;

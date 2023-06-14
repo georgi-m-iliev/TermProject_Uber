@@ -4,7 +4,7 @@
 #include <fstream>
 #include <limits>
 
-const int BUFFER_SIZE = 256;
+const int BUFFER_SIZE = 512;
 
 void Uber::readUsers(const char* filepath) {
     std::ifstream ifs(filepath, std::ios::in);

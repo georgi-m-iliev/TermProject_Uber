@@ -1,9 +1,9 @@
 #pragma once
-#include "Location.h"
-#include "MyString.h"
+#include "../Utilities/Location.h"
+#include "../Utilities/MyString.h"
 #include "../Users/Client.h"
 #include "../Users/Driver.h"
-#include "vector.hpp"
+#include "../Utilities/vector.hpp"
 
 enum class OrderStatus {
     EMPTY,
