@@ -48,65 +48,12 @@ void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
     while(!ifs.eof()) {
         ifs.getline(buffer, BUFFER_SIZE);
         std::stringstream ss(buffer);
-        char* messages[] = {(char*)"id", (char*)"status", (char*)"clientUsername", (char*)"driverUsername",
-                          (char*)"address", (char*)"destination", (char*)"passengers", (char*)"minutes",(char*)"amount"};
-        char buffer2[sizeof(messages) / sizeof(char*) - 6][BUFFER_SIZE];
-        Location l1, l2; //4, 5
-        short status, passengers, minutes; // 1,6,7
-        size_t amount; //7
-        Client* client = nullptr;
-        Driver* driver = nullptr;
-        for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
-            if(ss.eof()) {
-                throw std::runtime_error("Row consists of incomplete data!");
-            }
-            switch(i) {
-                case 1:
-                    ss >> status;
-                    ss.ignore(1, ',');
-                    break;
-                case 4:
-                    ss >> l1;
-//                    ss.ignore(1, ',');
-                    break;
-                case 5:
-                    ss >> l2;
-//                    ss.ignore(1, ',');
-                    break;
-                case 6:
-                    ss >> passengers;
-                    ss.ignore(1, ',');
-                    break;
-                case 7:
-                    ss >> minutes;
-                    ss.ignore(1, ',');
-                    break;
-                case 8:
-                    ss >> amount;
-                    ss.ignore(1, ',');
-                    break;
-                default:
-                    ss.getline(buffer2[j++], BUFFER_SIZE, ',');
-            }
-        }
-        if(!ss.eof()) {
-            throw std::runtime_error("Row consists of too much data!");
-        }
-        if(strcmp(buffer2[2], "NULL") == 0) {
-            driver = nullptr;
-        }
-        for(int k = 0; k < users.getSize(); k++) {
-            if(strcmp(users[k]->getUsername().c_str(), buffer2[1]) == 0) {
-                client = dynamic_cast<Client*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is of wrong kind
-            }
-            else if(strcmp(buffer2[2], "NULL") != 0 && strcmp(users[k]->getUsername().c_str(), buffer2[2]) == 0) {
-                driver = dynamic_cast<Driver*>(&*users[k]); // it is desired to be nullptr, if for some reason a user is of wrong kind
-            }
-        }
+        Order order;
+        order.read(ss, users);
         if(addNet) {
-            netEarnings += (double)amount / 100.0;
+            netEarnings += order.getAmount();
         }
-        col.push_back(Order(buffer2[0], (OrderStatus)status, client, driver, l1, l2, passengers, minutes, amount));
+        col.push_back(std::move(order));
     }
 
     ifs.close();
@@ -175,20 +122,7 @@ void Uber::saveOrders(const char* filepath, vector<Order>& col) {
     ofs << "id,status,clientUsername,driverUsername,address,destination,passengers,minutes,amount";
     for(size_t i = 0; i < col.getSize(); i++) {
         ofs << '\n';
-        ofs << col[i].getID() << ',';
-        ofs << (int)col[i].getStatus() << ',';
-        ofs << col[i].getClient()->getUsername() << ',';
-        if(col[i].getDriver()) {
-            ofs << col[i].getDriver()->getUsername() << ',';
-        }
-        else {
-            ofs << "NULL" << ',';
-        }
-        ofs << col[i].getAddress().getName() << " " << col[i].getAddress().getPoint().x << " " << col[i].getAddress().getPoint().y <<  ',';
-        ofs << col[i].getDestination().getName() << " " << col[i].getDestination().getPoint().x << " " << col[i].getDestination().getPoint().y <<  ',';
-        ofs << col[i].getPassengers() << ',';
-        ofs << col[i].getMinutes() << ',';
-        ofs << col[i].getAmount();
+        col[i].write(ofs);
     }
 
     ofs.close();

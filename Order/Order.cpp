@@ -2,7 +2,10 @@
 #include <cstring>
 #include <chrono>
 
+
 namespace {
+    const int BUFFER_SIZE = 512;
+
     void numToStr(size_t num, char* str, int length) {
         int len = 0;
         size_t copy = num;
@@ -144,6 +147,10 @@ size_t Order::getAmountNom() const {
     return (size_t)(amount / 100);
 }
 
+void Order::setID(const char* id) {
+    this->id = id;
+}
+
 void Order::setStatus(OrderStatus status) {
     this->status = status;
 }
@@ -165,12 +172,21 @@ void Order::setAddress(const char* name, int x, int y, const char* note) {
     calcID();
 }
 
+
+void Order::setAddress(const Location& loc) {
+    address = loc;
+}
+
 void Order::setDestination(const char* name, int x, int y, const char* note) {
     destination.setName(name);
     destination.setPoint(x, y);
     if(strlen(note) != 0) {
         destination.setNote(note);
     }
+}
+
+void Order::setDestination(const Location& loc) {
+    destination = loc;
 }
 
 void Order::setPassengers(short passengers) {
@@ -234,4 +250,79 @@ bool Order::hasDeclined(const User* user) const {
 
 void Order::clearDriversDeclined() {
     driversDeclined.clear();
+}
+
+std::istream& Order::read(std::istream& inp, vector<ObjPtr<User>>& users) {
+    char* messages[] = {(char*)"id", (char*)"status", (char*)"clientUsername", (char*)"driverUsername",
+                        (char*)"address", (char*)"destination", (char*)"passengers", (char*)"minutes",(char*)"amount"};
+    char stringData[sizeof(messages) / sizeof(char*) - 6][BUFFER_SIZE];
+    short status;
+    for(int i = 0, j = 0; i < sizeof(messages) / sizeof(char*); i++) {
+        if(inp.eof()) {
+            throw std::runtime_error("Row consists of incomplete data!");
+        }
+        switch(i) {
+            case 1:
+                inp >> status;
+                inp.ignore(1, ',');
+                break;
+            case 4:
+                inp >> address;
+//                    inp.ignore(1, ','); - no need to clear a comma, as it is handled by Location
+                break;
+            case 5:
+                inp >> destination;
+//                    inp.ignore(1, ','); - no need to clear a comma, as it is handled by Location
+                break;
+            case 6:
+                inp >> passengers;
+                inp.ignore(1, ',');
+                break;
+            case 7:
+                inp >> minutes;
+                inp.ignore(1, ',');
+                break;
+            case 8:
+                inp >> amount;
+                inp.ignore(1, ',');
+                break;
+            default:
+                inp.getline(stringData[j++], BUFFER_SIZE, ',');
+        }
+    }
+    if(!inp.eof()) {
+        throw std::runtime_error("Row consists of too much data!");
+    }
+    if(strcmp(stringData[2], "NULL") == 0) {
+        driver = nullptr;
+    }
+    for(int k = 0; k < users.getSize(); k++) {
+        if(strcmp(users[k]->getUsername().c_str(), stringData[1]) == 0) {
+            setClient(dynamic_cast<Client*>(&*users[k])); // it is desired to be nullptr, if for some reason a user is of wrong kind
+        }
+        else if(strcmp(stringData[2], "NULL") != 0 && strcmp(users[k]->getUsername().c_str(), stringData[2]) == 0) {
+            setDriver(dynamic_cast<Driver*>(&*users[k])); // it is desired to be nullptr, if for some reason a user is of wrong kind
+        }
+    }
+    setID(stringData[0]);
+    setStatus((OrderStatus)status);
+    return inp;
+}
+
+std::ostream& Order::write(std::ostream& out) const {
+    out << getID() << ',';
+    out << (int)getStatus() << ',';
+    out << getClient()->getUsername() << ',';
+    if(getDriver()) {
+        out << getDriver()->getUsername() << ',';
+    }
+    else {
+        out << "NULL" << ',';
+    }
+    out << getAddress().getName() << " " << getAddress().getPoint().x << " " << getAddress().getPoint().y <<  ',';
+    out << getDestination().getName() << " " << getDestination().getPoint().x << " " << getDestination().getPoint().y <<  ',';
+    out << getPassengers() << ',';
+    out << getMinutes() << ',';
+    out << getAmount();
+    return out;
 }

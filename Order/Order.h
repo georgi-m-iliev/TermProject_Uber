@@ -4,6 +4,7 @@
 #include "../Users/Client.h"
 #include "../Users/Driver.h"
 #include "../Utilities/vector.hpp"
+#include "../Utilities/ObjPtr.hpp"
 
 enum class OrderStatus {
     EMPTY,
@@ -33,6 +34,8 @@ class Order {
 
     vector<const User*> driversDeclined; // this would be a shallow copy, as I would need it only during runtime
                                         // since we aren't allowing users to delete account, there won't be a problem
+
+    void setID(const char* id);
 public:
     Order();
     Order(const char* addressName, int addressX, int addressY,
@@ -64,7 +67,9 @@ public:
     void setClient(Client* client);
     void setDriver(Driver* driver);
     void setAddress(const char* name, int x, int y, const char* note = nullptr);
+    void setAddress(const Location& loc);
     void setDestination(const char* name, int x, int y, const char* note = nullptr);
+    void setDestination(const Location& loc);
     void setPassengers(short passengers);
     void setMinutes(short minutes);
     void setAmount(double amount);
@@ -75,6 +80,9 @@ public:
     void addDriverDeclined(const User* user);
     bool hasDeclined(const User* user) const;
     void clearDriversDeclined();
+
+    std::istream& read(std::istream& inp, vector<ObjPtr<User>>& users);
+    std::ostream& write(std::ostream& out) const;
 
 //    friend class Uber;
     friend std::ostream& operator<<(std::ostream& os, const Order& order);
