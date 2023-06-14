@@ -495,7 +495,7 @@ void Uber::cancelOrder(const char* id) {
     order.setStatus(OrderStatus::CANCELED);
     if(order.getDriver() != nullptr) {
         order.getDriver()->setAvailability(true);
-        order.getDriver()->addSystemWarning(WarningType::ORDER_CANCELD, order.getID());
+        order.getDriver()->addSystemWarning(WarningType::ORDER_CANCELED, order.getID());
     }
     moveOrderToFinished(order.getID());
     std::cout << "Order has been canceled!" << std::endl;

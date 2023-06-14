@@ -10,7 +10,7 @@ enum class UserType {
 
 enum class WarningType {
     NEW_ORDER,
-    ORDER_CANCELD,
+    ORDER_CANCELED,
     ORDER_ACCEPTED
 };
 
