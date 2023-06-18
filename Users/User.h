@@ -2,7 +2,6 @@
 #include "../Utilities/MyString.h"
 #include "../Utilities/vector.hpp"
 
-
 enum class UserType {
     Client = 0,
     Driver = 1
@@ -21,10 +20,7 @@ class User {
     MyString lastName;
     size_t wallet;
     vector<MyString> systemWarnings;
-
 public:
-    const int BUFFER_SIZE = 512;
-
     User() = default;
     User(const char* username, const char* password, const char* firstName, const char* lastName, size_t wallet);
     User(const User& other) = default;

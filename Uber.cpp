@@ -326,6 +326,9 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
+            if(strlen(buffer[1]) < 5) {
+                throw std::invalid_argument("Password should be at least 6 characters!");
+            }
             users.push_back(ObjPtr<User>(
                 new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
             ));
@@ -373,6 +376,9 @@ void Uber::logoutUser() {
 
 void Uber::changePassword(const char* password) {
     checkUserLoggedIn();
+    if(strlen(password) < 5) {
+        throw std::invalid_argument("Password should be at least 6 characters!");
+    }
     activeUser->setPassword(password);
     std::cout << "Password changes successfully!";
 }
@@ -390,7 +396,7 @@ void Uber::listOrders() const {
         case UserType::Client:
             for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
                 if(activeOrders[i].getClient() == activeUser) {
-                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                    std::cout << (++counter) << ". " << activeOrders[i].getID() << std::endl;
                 }
             }
             break;
@@ -504,6 +510,10 @@ void Uber::cancelOrder(const char* id) {
 void Uber::payOrder(const char* id, double levas) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
+
+    if(levas <= 0) {
+        throw std::invalid_argument("You have specified an invalid amount!");
+    }
 
     if(activeUser->getBalance() < (size_t)(levas * 100)) {
         throw std::runtime_error("You don't have enough balance to pay this order!\nPlease use the deposit functionality!");

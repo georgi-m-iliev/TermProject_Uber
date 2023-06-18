@@ -29,12 +29,10 @@ class Order {
     short passengers;
     short minutes;
     size_t amount;
-
-    void calcID();
-
     vector<const User*> driversDeclined; // this would be a shallow copy, as I would need it only during runtime
                                         // since we aren't allowing users to delete account, there won't be a problem
 
+    void calcID();
     void setID(const char* id);
 public:
     Order();

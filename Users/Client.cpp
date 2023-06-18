@@ -1,5 +1,9 @@
 #include "Client.h"
 
+namespace {
+    const int BUFFER_SIZE = 512;
+}
+
 Client::Client(const char* username, const char* password,
                const char* firstName, const char* lastName) : User(username, password, firstName, lastName, 0) {}
 

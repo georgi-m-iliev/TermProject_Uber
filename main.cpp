@@ -3,7 +3,7 @@
 #include <sstream>
 #include "Uber.h"
 
-static int BUFFER_SIZE = 1024;
+const int BUFFER_SIZE = 1024;
 
 void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
     char buffer[BUFFER_SIZE];
@@ -100,8 +100,17 @@ void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
     }
     else if(strcmp(buffer, "pay") == 0) {
         ss.getline(buffer, BUFFER_SIZE, ' ');
-        double value;
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
+        double value = -1;
         ss >> value;
+        ss.ignore(1);
+        if(!ss.eof()) {
+            std::cout << "You have provided more than the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         try {
             service.payOrder(buffer, value);
         }
@@ -111,8 +120,17 @@ void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
     }
     else if(strcmp(buffer, "rate") == 0) {
         ss.getline(buffer, BUFFER_SIZE, ' ');
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         short value = 0;
         ss >> value;
+        ss.ignore(1);
+        if(!ss.eof()) {
+            std::cout << "You have provided more than the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         try {
             service.rateOrder(buffer, value);
         }
@@ -121,8 +139,13 @@ void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
         }
     }
     else if(strcmp(buffer, "add_money") == 0) {
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         double value = 0;
         ss >> value;
+        ss.ignore(1);
         try {
             service.addMoney(value);
         }
@@ -156,11 +179,23 @@ void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
     }
     else if(strcmp(buffer, "accept_order") == 0) {
         ss.getline(buffer, BUFFER_SIZE, ' ');
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         short minutes = 0;
         ss >> minutes;
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         double amount = 0;
         ss >> amount;
         ss.ignore(1);
+        if(!ss.eof()) {
+            std::cout << "You have provided more than the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         try {
             service.acceptOrder(buffer, minutes, amount);
         }
@@ -197,9 +232,17 @@ void parseCommandAndExecute(Uber& service, std::stringstream& ss) {
     }
     else if(strcmp(buffer, "accept_payment") == 0) {
         ss.getline(buffer, BUFFER_SIZE, ' ');
+        if(ss.eof()) {
+            std::cout << "You haven't provided all the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         double amount = 0;
         ss >> amount;
         ss.ignore(1);
+        if(!ss.eof()) {
+            std::cout << "You have provided more than the needed arguments!" << std::endl << "Try again!" << std::endl;
+            return;
+        }
         try {
             service.acceptPayment(buffer, amount);
         }
