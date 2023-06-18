@@ -5,7 +5,7 @@
 #include "Users/Driver.h"
 #include "Order/Order.h"
 
-const char DEFAULT_PATH[] = R"(D:\Workspace\FMI\OOP_TermProject_Uber\)";
+const char DEFAULT_PATH[] = R"(./)";
 
 class Uber {
     MyString path;
