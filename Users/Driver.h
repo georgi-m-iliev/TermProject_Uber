@@ -27,6 +27,7 @@ public:
     const Location& getCurrentLocation() const;
     double getRating() const;
     bool isAvailable() const;
+    bool isCurrentLocationUnknown() const;
 
     void setCarNumber(const char* str);
     void setPhoneNumber(const char* str);

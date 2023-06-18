@@ -50,7 +50,7 @@ void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
         std::stringstream ss(buffer);
         Order order;
         order.read(ss, users);
-        if(addNet) {
+        if(addNet && order.getStatus() == OrderStatus::FINISHED) {
             netEarnings += order.getAmount();
         }
         col.push_back(std::move(order));
@@ -232,7 +232,10 @@ void Uber::handoutOrders() {
         double minDistance = std::numeric_limits<double>::max();
         int minInd = -1;
         for(int j = 0; j < users.getSize(); j++) {
-            if(users[j]->getType() == UserType::Client || !dynamic_cast<Driver&>(*users[j]).isAvailable()) {
+            if(users[j]->getType() == UserType::Client) {
+                continue;
+            }
+            if(!dynamic_cast<Driver&>(*users[j]).isAvailable() || dynamic_cast<Driver&>(*users[j]).isCurrentLocationUnknown()) {
                 continue;
             }
             if(activeOrders[i].hasDeclined(&*users[j])) {
@@ -326,6 +329,9 @@ void Uber::registerUser(const UserType type, std::stringstream& ss) {
             if(checkUserExist(buffer[0])) {
                 throw std::runtime_error("User with the same username already exists!");
             }
+            if(strlen(buffer[1]) < 5) {
+                throw std::invalid_argument("Password should be at least 6 characters!");
+            }
             users.push_back(ObjPtr<User>(
                 new Driver(buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5])
             ));
@@ -373,6 +379,9 @@ void Uber::logoutUser() {
 
 void Uber::changePassword(const char* password) {
     checkUserLoggedIn();
+    if(strlen(password) < 5) {
+        throw std::invalid_argument("Password should be at least 6 characters!");
+    }
     activeUser->setPassword(password);
     std::cout << "Password changes successfully!";
 }
@@ -390,14 +399,14 @@ void Uber::listOrders() const {
         case UserType::Client:
             for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
                 if(activeOrders[i].getClient() == activeUser) {
-                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                    std::cout << (++counter) << ". " << activeOrders[i].getID() << std::endl;
                 }
             }
             break;
         case UserType::Driver:
             for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
-                if(activeOrders[i].getDriver() == activeUser && activeOrders[i].getStatus() > OrderStatus::ACCEPTED_BY_DRIVER && activeOrders[i].getStatus() < OrderStatus::AWAITING_RATING) {
-                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                if(activeOrders[i].getDriver() == activeUser && activeOrders[i].getStatus() >= OrderStatus::ACCEPTED_BY_DRIVER && activeOrders[i].getStatus() <= OrderStatus::AWAITING_RATING) {
+                    std::cout << (++counter) << ". " << activeOrders[i].getID() << std::endl;
                 }
             }
             break;
@@ -504,6 +513,10 @@ void Uber::cancelOrder(const char* id) {
 void Uber::payOrder(const char* id, double levas) {
     checkUserLoggedIn();
     checkActiveUserType(UserType::Client);
+
+    if(levas <= 0) {
+        throw std::invalid_argument("You have specified an invalid amount!");
+    }
 
     if(activeUser->getBalance() < (size_t)(levas * 100)) {
         throw std::runtime_error("You don't have enough balance to pay this order!\nPlease use the deposit functionality!");

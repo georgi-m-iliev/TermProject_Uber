@@ -22,7 +22,7 @@ change_password <new password>
 whoami
 list_orders
 
---------Order----------
+---Making an order---
 order
 check_order <id>
 cancel_order <id>
@@ -30,7 +30,7 @@ pay <id> <amount>
 rate <id> <rating>
 add_money <amount>
 
---------Drivers----------
+-------Drivers-------
 change_address <name> <x coordinate> <y coordinate>
 check_messages
 accept_order <id> <minutes> <amount>

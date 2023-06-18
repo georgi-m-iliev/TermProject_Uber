@@ -1,5 +1,9 @@
 #include "Driver.h"
 
+namespace {
+    const int BUFFER_SIZE = 512;
+}
+
 Driver::Driver(const char* username, const char* password, const char* firstName, const char* lastName,
                const char* carNumber, const char* phone):
         User(username, password, firstName, lastName, 0),
@@ -31,6 +35,10 @@ double Driver::getRating() const {
 
 bool Driver::isAvailable() const {
     return availability;
+}
+
+bool Driver::isCurrentLocationUnknown() const {
+    return currentLocation.getName().length() == 0;
 }
 
 void Driver::setCarNumber(const char* str) {

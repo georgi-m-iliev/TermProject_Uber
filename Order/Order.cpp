@@ -2,7 +2,6 @@
 #include <cstring>
 #include <chrono>
 
-
 namespace {
     const int BUFFER_SIZE = 512;
 
