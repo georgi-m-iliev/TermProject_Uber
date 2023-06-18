@@ -50,7 +50,7 @@ void Uber::readOrders(const char* filepath, vector<Order>& col, bool addNet) {
         std::stringstream ss(buffer);
         Order order;
         order.read(ss, users);
-        if(addNet) {
+        if(addNet && order.getStatus() == OrderStatus::FINISHED) {
             netEarnings += order.getAmount();
         }
         col.push_back(std::move(order));
@@ -405,8 +405,8 @@ void Uber::listOrders() const {
             break;
         case UserType::Driver:
             for(size_t i = 0, counter = 0; i < activeOrders.getSize(); i++) {
-                if(activeOrders[i].getDriver() == activeUser && activeOrders[i].getStatus() > OrderStatus::ACCEPTED_BY_DRIVER && activeOrders[i].getStatus() < OrderStatus::AWAITING_RATING) {
-                    std::cout << (++counter) << "." << activeOrders[i].getID() << std::endl;
+                if(activeOrders[i].getDriver() == activeUser && activeOrders[i].getStatus() >= OrderStatus::ACCEPTED_BY_DRIVER && activeOrders[i].getStatus() <= OrderStatus::AWAITING_RATING) {
+                    std::cout << (++counter) << ". " << activeOrders[i].getID() << std::endl;
                 }
             }
             break;
