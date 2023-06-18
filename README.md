@@ -12,6 +12,8 @@ You can use the provided CMakeLists.txt file if you want to!
 
 After compilation just execute it...
 
+NB: Keep in mind that if you edit the .csv files manually they become OS-dependant and need to be converted with tool like unix2dos, dos2unix.
+
 ## Available commands
 ```
 --------Users--------
