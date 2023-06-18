@@ -96,6 +96,7 @@ std::istream& Driver::read(std::istream& inp) {
                 break;
             case 8:
                 inp >> availability;
+                inp.ignore(1);
                 break;
             default:
                 inp.getline(buffer2[j++], BUFFER_SIZE, ',');

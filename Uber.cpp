@@ -4,7 +4,9 @@
 #include <fstream>
 #include <limits>
 
-const int BUFFER_SIZE = 512;
+namespace {
+    const int BUFFER_SIZE = 512;
+}
 
 void Uber::readUsers(const char* filepath) {
     std::ifstream ifs(filepath, std::ios::in);
@@ -106,7 +108,7 @@ void Uber::saveUsers(const char* filepath) {
     ofs << "type,username,password_hash,first_name,last_name,amount,car_number,phone_number,rating,availability";
 
     for(size_t i = 0; i < users.getSize(); i++) {
-        ofs << '\n';
+        ofs << std::endl;
         users[i]->write(ofs);
     }
 
@@ -121,7 +123,7 @@ void Uber::saveOrders(const char* filepath, vector<Order>& col) {
 
     ofs << "id,status,clientUsername,driverUsername,address,destination,passengers,minutes,amount";
     for(size_t i = 0; i < col.getSize(); i++) {
-        ofs << '\n';
+        ofs << std::endl;
         col[i].write(ofs);
     }
 

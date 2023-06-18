@@ -283,7 +283,7 @@ std::istream& Order::read(std::istream& inp, vector<ObjPtr<User>>& users) {
                 break;
             case 8:
                 inp >> amount;
-                inp.ignore(1, ',');
+                inp.ignore(1);
                 break;
             default:
                 inp.getline(stringData[j++], BUFFER_SIZE, ',');

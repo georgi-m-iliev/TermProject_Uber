@@ -32,6 +32,7 @@ std::istream& Client::read(std::istream& inp) {
         switch(i) {
             case 4:
                 inp >> amount;
+                inp.ignore(1);
                 break;
             default:
                 inp.getline(buffer2[i], BUFFER_SIZE, ',');
