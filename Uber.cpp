@@ -232,7 +232,10 @@ void Uber::handoutOrders() {
         double minDistance = std::numeric_limits<double>::max();
         int minInd = -1;
         for(int j = 0; j < users.getSize(); j++) {
-            if(users[j]->getType() == UserType::Client || !dynamic_cast<Driver&>(*users[j]).isAvailable()) {
+            if(users[j]->getType() == UserType::Client) {
+                continue;
+            }
+            if(!dynamic_cast<Driver&>(*users[j]).isAvailable() || dynamic_cast<Driver&>(*users[j]).isCurrentLocationUnknown()) {
                 continue;
             }
             if(activeOrders[i].hasDeclined(&*users[j])) {

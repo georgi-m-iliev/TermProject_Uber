@@ -37,6 +37,10 @@ bool Driver::isAvailable() const {
     return availability;
 }
 
+bool Driver::isCurrentLocationUnknown() const {
+    return currentLocation.getName().length() == 0;
+}
+
 void Driver::setCarNumber(const char* str) {
     carNumber = str;
 }
