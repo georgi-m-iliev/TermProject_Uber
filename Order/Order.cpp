@@ -143,7 +143,7 @@ double Order::getAmount() const {
 }
 
 size_t Order::getAmountNom() const {
-    return (size_t)(amount / 100);
+    return amount;
 }
 
 void Order::setID(const char* id) {
@@ -322,6 +322,6 @@ std::ostream& Order::write(std::ostream& out) const {
     out << getDestination().getName() << " " << getDestination().getPoint().x << " " << getDestination().getPoint().y <<  ',';
     out << getPassengers() << ',';
     out << getMinutes() << ',';
-    out << getAmount();
+    out << getAmountNom();
     return out;
 }

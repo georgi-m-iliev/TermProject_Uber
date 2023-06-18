@@ -520,7 +520,7 @@ void Uber::payOrder(const char* id, double levas) {
         throw std::invalid_argument("You have specified an invalid amount!");
     }
 
-    if(activeUser->getBalance() < (size_t)(levas * 100)) {
+    if(activeUser->getBalanceNom() < (size_t)(levas * 100)) {
         throw std::runtime_error("You don't have enough balance to pay this order!\nPlease use the deposit functionality!");
     }
 
